@@ -1,29 +1,34 @@
+var Pnode=require("./pnode");
+
 var Container_link=React.createClass({
 	propTypes:{
-		name:React.PropTypes.string.isRequired
-		,db:React.PropTypes.string.isRequired
+		db:React.PropTypes.string.isRequired
 	}
-	,renderAccordion:function(name){
-		return  <div className="panel panel-default">
-	    <div className="panel-heading" role="tab">
-	      <h4 className="panel-title">
-	        <a className="collapsed" data-toggle="collapse" data-parent="#accordion" href={"#"+name} aria-controls={name}>
-	          links
-	        </a>
-	      </h4>
-	    </div>
-	    <div id={name} className="panel-collapse collapse in" role="tabpanel" aria-labelledby={name}>
-	      <div className="panel-body">
-	      	.......
-	      </div>
-		</div>
-		</div>
+	,getInitialState:function() {
+		return {links:
+			[
+			{name:"x",payload:{},
+				pcode:[2,3,5] },
+			{name:"y",payload:{},
+				pcode:[2,3,5]}
+			] 
+		 }
+	}
+	,renderLink:function(link,idx){
+		return <Pnode key={"k"+idx} link={link}/>
+	}
+	,shouldComponentUpdate:function() {
+		return false;
 	}
 	,render:function(){
-		return 	<div className="panel-group" id={this.props.db+"_accordion"} role="tablist">
-				{this.renderAccordion(this.props.db+"_forward")}
-				{this.renderAccordion(this.props.db+"_backward")}
-			</div>
+		return 	<div className="panel panel-default">
+	    			<div className="panel-heading" role="tab">
+	      				<h4 className="panel-title">Links</h4>
+	      			</div>
+	      			<div className="panel-body">
+						{this.state.links.map(this.renderLink)}
+					</div>
+				</div>
 	}
 });
 module.exports=Container_link;

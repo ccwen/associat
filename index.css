@@ -1,3 +1,9 @@
 /* application css */
 #main {font-size:200%;}
 .hl {color:red;}
+.btnlink_pinned {background-image: url(img/pin_sm.png);cursor: pointer;background-repeat:no-repeat;}
+.btnlink_clickable {background-image: url(img/clickable_sm.png);cursor: pointer;background-repeat:no-repeat;}
+.btnlink_selected {background-image: url(img/selected_sm.png);cursor: pointer;background-repeat:no-repeat;}
+.selected_link {background-color: highlight}
+.pinned_link {}
+.btnpinlink {cursor:pointer}

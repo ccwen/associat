@@ -1,6 +1,4 @@
 var kse=require("ksana-search");
-var velocity=require("velocity-animate/velocity.min.js");
-require("velocity-animate/velocity.ui.min.js");
 
 var Container_perdb=require("./container_perdb.jsx");
 var Container_propedit=require("./container_propedit.jsx");

@@ -1,7 +1,10 @@
 var Container_link=require("./container_link.jsx");
 var Container_textview=require("./Container_textview.jsx");
 var Perdb=React.createClass({
-	render:function(){
+	getInitialState:function() {
+		return {};
+	}
+	,render:function(){
 		//need clearfix here
 		return <div className="clearfix">
 		    <div className="col-sm-5">
