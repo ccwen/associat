@@ -1,5 +1,6 @@
-var velocity=require("velocity-animate/velocity.min.js");
-require("velocity-animate/velocity.ui.js");
+var React=require("react");
+//var velocity=require("velocity-animate/velocity.min.js");
+//require("velocity-animate/velocity.ui.js");
 
 var Pnode=React.createClass({
 	propTypes:{

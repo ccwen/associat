@@ -1,0 +1,7 @@
+/*
+  maintain a list of and selected pnode and span
+
+  provide function to retrieve selected pcode
+
+  
+*/

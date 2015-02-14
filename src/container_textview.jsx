@@ -1,3 +1,5 @@
+var React=require("react");
+var dragobject=require("./drag");
 var Container_textview=React.createClass({
 	propTypes:{
 		db:React.PropTypes.string.isRequired
@@ -17,12 +19,23 @@ var Container_textview=React.createClass({
 		if (n==this.state.selected)  extra=" active";
 		return <li role="presentation" key={"nav"+id} className={extra}><a role="tab" href={"#"+id}  data-toggle="tab">{tab}</a></li>
 	}
+	,dragstart:function(e) {
+		if (dragobject.dragging) return;
+		dragobject.from=e.target;
+		var range = window.getSelection().getRangeAt(0);
+		if (range) {
+			dragobject.seg=1;
+			dragobject.start=range.startOffset; //need to get span  vpos
+			dragobject.len=range.endOffset-range.startOffset //need to get span vpos
+			dragobject.dragging=true;	
+		}
+	}
 	,render:function(){
 		return <div>
 			<ul className="nav nav-tabs" role="tablist">
 				{this.state.titles.map(this.renderTabNav)}
 			</ul>
-			<div className="tab-content" style={{overflow:"auto"}}>
+			<div onDrag={this.dragstart} className="tab-content" style={{overflow:"auto"}}>
 				{this.state.texts.map(this.renderTabContent)}
 			</div>
 		</div>

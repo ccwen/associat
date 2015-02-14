@@ -1,4 +1,4 @@
-
+var React=require("react");
 var Perdb=require("./perdb.jsx");
 var Container_perdb=React.createClass({
 	getInitialState:function() {
