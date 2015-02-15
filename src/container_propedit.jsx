@@ -6,27 +6,28 @@ var React=require("react");
 //string , normal text
 var E=React.createElement;
 var relations={
-	6: [ {caption:"R2"} ,"c1", 252, "c2"]
-	,7: [{caption:"R1"} ,"b1", 6 , "b2",6]
+	516:[{caption:"引用"}]
+	,1024:[{caption:"R4"},"aaa",517,"bb"]
+	,517:[{caption:"引用2"}]
+	,768:[{caption:"R3"},"xxxx",1024,"qqqq"]
+	,256: [ {caption:"R2"} ,"c1", 516, "c2", 768]
+	,512: [{caption:"R1"} ,"b1", 256 , "b2",256]
 }
-var editing_rel=[{caption:"editing r"}, "a1xyzxyz",7, "qq",516 ,"a2xyzxyz"];
-var relbtnstyle={cursor:"pointer",color:"blue"};
-var spanbtnstyle={cursor:"pointer",borderBottomStyle:"double",borderColor:"blue"};
+var editing_rel=[{caption:"editing r"}, "a1xyzxyz",512, "qq",516 ,"a2xyzxyz"];
+//var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
+var spanbtnstyle={cursor:"pointer",borderColor:"blue",textDecoration:"underline"};
 var textstyle={cursor:"auto"};
 var dragobject=require("./drag");
-//var velocity=require("velocity-animate/velocity.min.js");
-//require("velocity-animate/velocity.ui.js");
+var MAXVISIBLEDEPTH=4;
 
 var styleFromDepth=function(depth) {
-	var color="#ffffff";
-	if (depth==1) {
-		color="#cfcfcf";
-	} else if (depth==2) {
-		color="#8f8f8f";
-	} else if (depth==3) {
-		color="#6f6f6f";
+	var out={};
+	if (depth) {
+		out.padding = (MAXVISIBLEDEPTH-depth)*2+"px";
+		out.border="dotted 1px";
+		out.borderRadius="5px";
 	}
-	return {borderRadius:"5px",background:color};
+	return out;
 }
 
 var Relation=React.createClass({
@@ -35,32 +36,48 @@ var Relation=React.createClass({
 		e.stopPropagation();
 		this.forceUpdate();
 	}
+	,renderRel:function(rel,opened,pcode,idx) {
+		var children=null,extra=null;
+		var rcaption=rel[0].caption;
+		if (opened){
+			extra=" ",
+			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px",borderColor:"darkblue"};
+			children=<Relation depth={this.props.depth+1} rel={rel} />
+		} else {
+			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px",borderColor:"blue"};
+
+		}
+		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
+		return E("span",{"data-pcode":pcode,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
+						, expander, extra,
+						children,extra);
+	}
+	,openpnode:function(e) {
+		var pcode=e.target.dataset.pcode
+		console.log("open pnode",pcode);
+	}
 	,renderItem:function(item,idx) {
 		if (idx==0) return;
 
 		if (typeof item=="string") {
-			return <span key={"k"+idx} data-n={idx} style={textstyle} dangerouslySetInnerHTML={{__html:item}}/>	
+			item=item.replace(/\n/g,"<br/>");
+			return <span key={"k"+idx} data-n={idx} style={textstyle} 
+				dangerouslySetInnerHTML={{__html:item}}/>	
 		} else if (typeof item==="number") {
 			var opened=false;
-			if (item<0) {
-				opened=true;
-			}
+			if (item<0) opened=true;
 			var rel=relations[Math.abs(item)];
-			var extra="",children=null;
+			var extra=null,children=null;
+			var expander=null;
 			if (rel) {
-				var rcaption=rel[0].caption+"+";
-				if (opened){
-					extra=" ",
-					relbtnstyle={cursor:"pointer",textDecoration:"underline",color:"darkblue"};
-					children=<Relation depth={this.props.depth+1} rel={rel} />
-					rcaption=rel[0].caption+"-";
+				if (Math.abs(item)%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
+					return this.renderRel(rel,opened,item,idx);
 				} else {
-					relbtnstyle={cursor:"pointer",color:"blue"};
+					//final node, a span or a rel depth > MAXVISIBLEDEPTH
+
+					return E("span",{"data-pcode":item,"data-n":idx,style:spanbtnstyle,
+						key:"k"+idx,onClick:this.openpnode, contentEditable:false,readOnly:true},rel[0].caption);
 				}
-				return E("span",{"data-pcode":item,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
-						, E("a",{onClick:this.openRel
-						, style:relbtnstyle},rcaption), extra,
-						children,extra);
 			} else {
 				return <span key={"k"+idx} data-pcode={item} data-n={idx} style={spanbtnstyle}>{Math.abs(item)}</span>
 			}
@@ -81,11 +98,9 @@ var html2pcode=function(div,old) {
 		if (node.dataset.pcode) {
 				out.push(parseInt(node.dataset.pcode));
 		} else {
-			var s=node.innerText.replace(/\n/g,function(){return "<br/>"});
-			out.push(s);
+			out.push(node.innerText);
 		}
 	}
-	console.log(out)
 	return out;
 }
 var Container_propedit=React.createClass({
@@ -99,11 +114,14 @@ var Container_propedit=React.createClass({
 	,oninput:function(e) {
 		var body=this.refs.body.getDOMNode();
 		editing_rel=html2pcode(body.children[0],editing_rel);
-		console.log(editing_rel)
+		//console.log(editing_rel)
 	}
 	,addSpan:function(n,at,text) {
 		var s=editing_rel[n];
 		var span=dragobject.start*256+dragobject.len;
+
+		if (!relations[span]) relations[span]=[{caption:text}];
+
 		if (at==0) {
 			editing_rel.splice(n-1,0,span);
 		} else if (at==s.length-1) {
@@ -121,6 +139,7 @@ var Container_propedit=React.createClass({
 		if (range.startContainer.nodeName!=="#text") return;
 		var at=range.startOffset;
 		var data = e.dataTransfer.getData("text");
+		relations.add
 		var n=parseInt(range.startContainer.parentNode.dataset.n);
 		if (n) this.addSpan(n,at,data)
 		dragobject.dragging=false;		
@@ -143,7 +162,7 @@ var Container_propedit=React.createClass({
 			</div>
 			<div ref="body" onInput={this.oninput} onDrop={this.drop} 
 			onDragOver={this.allowdrop} spellCheck="false" 
-			className="panel-body" style={{display:"inline-block"}}>
+			className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
 				<Relation rel={editing_rel} depth={0}/>
 			</div>
 					

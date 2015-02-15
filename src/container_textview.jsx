@@ -29,13 +29,19 @@ var Container_textview=React.createClass({
 			dragobject.len=range.endOffset-range.startOffset //need to get span vpos
 			dragobject.dragging=true;	
 		}
+		console.log("drag start")
+	}
+	,dragend:function(e) {
+		dragobject.dragging=false;
+		console.log("drag stop")
 	}
 	,render:function(){
 		return <div>
 			<ul className="nav nav-tabs" role="tablist">
 				{this.state.titles.map(this.renderTabNav)}
 			</ul>
-			<div onDrag={this.dragstart} className="tab-content" style={{overflow:"auto"}}>
+			<div onDragStart={this.dragstart} onDragEnd={this.dragend} 
+			    className="tab-content" style={{overflow:"auto"}}>
 				{this.state.texts.map(this.renderTabContent)}
 			</div>
 		</div>
