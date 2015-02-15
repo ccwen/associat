@@ -7,10 +7,10 @@ var React=require("react");
 var E=React.createElement;
 var relations={
 	6: [ {caption:"R2"} ,"c1", 252, "c2"]
-	,7: [{caption:"R1"} ,"b1", {rel:6}, "b2",{rel:6}]
+	,7: [{caption:"R1"} ,"b1", 6 , "b2",6]
 }
-var editing_rel=[{caption:"editing r"}, "a1xyzxyz",{rel:7,label:"r1"}, 516 ,"a2xyzxyz"];
-var relbtnstyle={cursor:"pointer"};
+var editing_rel=[{caption:"editing r"}, "a1xyzxyz",7, "qq",516 ,"a2xyzxyz"];
+var relbtnstyle={cursor:"pointer",color:"blue"};
 var spanbtnstyle={cursor:"pointer",borderBottomStyle:"double",borderColor:"blue"};
 var textstyle={cursor:"auto"};
 var dragobject=require("./drag");
@@ -31,27 +31,39 @@ var styleFromDepth=function(depth) {
 
 var Relation=React.createClass({
 	openRel:function(e) {
-		var item=this.props.rel[e.target.parentNode.dataset.n];
-		item.o=!item.o;
+		this.props.rel[e.target.parentNode.dataset.n]=-this.props.rel[e.target.parentNode.dataset.n];
 		e.stopPropagation();
 		this.forceUpdate();
 	}
 	,renderItem:function(item,idx) {
-		if (typeof item==="number") {
-			return <span key={"k"+idx} contentEditable={false} readOnly={true} style={spanbtnstyle}>{item}</span>
-		} else if (typeof item=="string") {
-			return <span key={"k"+idx} data-n={idx} style={textstyle}>{item}</span>
-		} else {
-			var opened=null;
-			var rel=relations[item.rel];
-			if (item.o) {
-				opened=<Relation depth={this.props.depth+1} rel={rel} />
+		if (idx==0) return;
+
+		if (typeof item=="string") {
+			return <span key={"k"+idx} data-n={idx} style={textstyle} dangerouslySetInnerHTML={{__html:item}}/>	
+		} else if (typeof item==="number") {
+			var opened=false;
+			if (item<0) {
+				opened=true;
 			}
-			if (!rel) return;
-			return E("span",{"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
-					, E("a",{onClick:this.openRel
-					, style:relbtnstyle},rel[0].caption), 
-					opened);
+			var rel=relations[Math.abs(item)];
+			var extra="",children=null;
+			if (rel) {
+				var rcaption=rel[0].caption+"+";
+				if (opened){
+					extra=" ",
+					relbtnstyle={cursor:"pointer",textDecoration:"underline",color:"darkblue"};
+					children=<Relation depth={this.props.depth+1} rel={rel} />
+					rcaption=rel[0].caption+"-";
+				} else {
+					relbtnstyle={cursor:"pointer",color:"blue"};
+				}
+				return E("span",{"data-pcode":item,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
+						, E("a",{onClick:this.openRel
+						, style:relbtnstyle},rcaption), extra,
+						children,extra);
+			} else {
+				return <span key={"k"+idx} data-pcode={item} data-n={idx} style={spanbtnstyle}>{Math.abs(item)}</span>
+			}
 		}
 	}
 	,render:function(){
@@ -60,7 +72,22 @@ var Relation=React.createClass({
 		</span>
 	}
 	
-})
+});
+var html2pcode=function(div,old) {
+	var nodes=div.children;
+	var out=[ old[0] ];
+	for (var i=0;i<nodes.length;i++) {
+		var node=nodes[i];
+		if (node.dataset.pcode) {
+				out.push(parseInt(node.dataset.pcode));
+		} else {
+			var s=node.innerText.replace(/\n/g,function(){return "<br/>"});
+			out.push(s);
+		}
+	}
+	console.log(out)
+	return out;
+}
 var Container_propedit=React.createClass({
 	toggleedit:function(e) {
 		var body=this.refs.body.getDOMNode();
@@ -68,6 +95,11 @@ var Container_propedit=React.createClass({
 		if (body.contentEditable==="true") {
 			body.focus();
 		}
+	}
+	,oninput:function(e) {
+		var body=this.refs.body.getDOMNode();
+		editing_rel=html2pcode(body.children[0],editing_rel);
+		console.log(editing_rel)
 	}
 	,addSpan:function(n,at,text) {
 		var s=editing_rel[n];
@@ -109,7 +141,9 @@ var Container_propedit=React.createClass({
 					<input type="checkbox" onClick={this.toggleedit} className="pull-right btn btn-xs btn-warning"/>
 				</h3>				
 			</div>
-			<div ref="body" onDrop={this.drop} onDragOver={this.allowdrop} spellCheck="false" className="panel-body">
+			<div ref="body" onInput={this.oninput} onDrop={this.drop} 
+			onDragOver={this.allowdrop} spellCheck="false" 
+			className="panel-body" style={{display:"inline-block"}}>
 				<Relation rel={editing_rel} depth={0}/>
 			</div>
 					

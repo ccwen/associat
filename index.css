@@ -7,3 +7,8 @@
 .selected_link {background-color: highlight}
 .pinned_link {}
 .btnpinlink {cursor:pointer}
+
+div[contenteditable=true] > div {
+  padding: 0;
+}
+
