@@ -15,7 +15,7 @@ var relations={
 }
 var editing_rel=[{caption:"editing r"}, "a1xyzxyz",512, "qq",516 ,"a2xyzxyz"];
 //var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
-var spanbtnstyle={cursor:"pointer",borderColor:"blue",textDecoration:"underline"};
+var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
 var textstyle={cursor:"auto"};
 var dragobject=require("./drag");
 var MAXVISIBLEDEPTH=4;
@@ -41,10 +41,10 @@ var Relation=React.createClass({
 		var rcaption=rel[0].caption;
 		if (opened){
 			extra=" ",
-			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px",borderColor:"darkblue"};
-			children=<Relation depth={this.props.depth+1} rel={rel} />
+			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
+			children=E(Relation,{depth:this.props.depth+1, rel:rel} );
 		} else {
-			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px",borderColor:"blue"};
+			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px blue"};
 
 		}
 		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
@@ -79,7 +79,7 @@ var Relation=React.createClass({
 						key:"k"+idx,onClick:this.openpnode, contentEditable:false,readOnly:true},rel[0].caption);
 				}
 			} else {
-				return <span key={"k"+idx} data-pcode={item} data-n={idx} style={spanbtnstyle}>{Math.abs(item)}</span>
+				return E("span",{key:"k"+idx,"data-pcode":item,"data-n":idx,"style":spanbtnstyle},Math.abs(item));
 			}
 		}
 	}
@@ -114,7 +114,13 @@ var Container_propedit=React.createClass({
 	,oninput:function(e) {
 		var body=this.refs.body.getDOMNode();
 		editing_rel=html2pcode(body.children[0],editing_rel);
-		//console.log(editing_rel)
+		console.log(editing_rel)
+	}
+	,onpaste:function(e) {
+		console.log("paste");
+    	var text = e.clipboardData.getData("text/plain");
+    	document.execCommand("insertHTML", false, text);		
+		e.preventDefault();
 	}
 	,addSpan:function(n,at,text) {
 		var s=editing_rel[n];
@@ -160,7 +166,7 @@ var Container_propedit=React.createClass({
 					<input type="checkbox" onClick={this.toggleedit} className="pull-right btn btn-xs btn-warning"/>
 				</h3>				
 			</div>
-			<div ref="body" onInput={this.oninput} onDrop={this.drop} 
+			<div ref="body" onPaste={this.onpaste} onInput={this.oninput} onDrop={this.drop} 
 			onDragOver={this.allowdrop} spellCheck="false" 
 			className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
 				<Relation rel={editing_rel} depth={0}/>
