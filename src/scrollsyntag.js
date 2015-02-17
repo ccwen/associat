@@ -7,7 +7,7 @@ var ScrollSyntag=React.createClass({
 	getInitialState:function() {
 		var pages=[];
 		var segcount=this.props.db.get("meta").segcount;
-		for (var i = 0; i < segcount; i++) {
+		for (var i = 0; i < segcount-1; i++) {
 			pages.push({
 				id: i+1,
 				data:null
@@ -87,7 +87,7 @@ var ScrollSyntag=React.createClass({
 				page.segname=segname;
 				this.loadedPages.unshift(page);
 				this.setState({hasPrevPage: this.hasPrevPage()});
-			}.bind(this),100);
+			}.bind(this),1);
 		},this);
 		return true;//set loadingPrevPage flag
 	}
