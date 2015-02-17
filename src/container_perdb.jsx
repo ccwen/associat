@@ -2,7 +2,7 @@ var React=require("react");
 var Perdb=require("./perdb.jsx");
 var Container_perdb=React.createClass({
 	getInitialState:function() {
-		return {dbcollection:["ds"]};
+		return {dbcollection:["dsl_jwn"]};
 	}
 	,renderPerdb:function(db){
 		return <Perdb key={db} db={db}/>

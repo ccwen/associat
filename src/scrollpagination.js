@@ -229,7 +229,7 @@ var ScrollPagination =  React.createClass({
 		var secondPage = pages[pageIds[1]];
 		var lastPage = pages[pageIds[pageIds.length-1]];
 		var secondLastPage = pages[pageIds[pageIds.length-2]];
-
+		var pageCount=Object.keys(pages).length;
 
 		var viewportHeight = this.__dimentions.viewportHeight;
 		var contentHeight = this.__dimentions.contentHeight;
@@ -240,17 +240,17 @@ var ScrollPagination =  React.createClass({
 		var remainingScrollTop = contentHeight - remainingScrollBottom - viewportHeight;
 
 		//if (lastPage && remainingScrollBottom < (lastPage.height /3)) {
-		if (lastPage && remainingScrollBottom < (viewportHeight)) {
+		if (lastPage && remainingScrollBottom < (viewportHeight/3)) {
 			//if (secondPage && remainingScrollTop > (firstPage.height + secondPage.height)) {
-			if (secondPage && remainingScrollTop > (viewportHeight*2)) {
+			if (pageCount>10&&  secondPage && remainingScrollTop > (viewportHeight)) {
 				this.__unloadPage(firstPage.id);
 			} else {
 				this.__loadNextPage();
 			}
 		//} else if (firstPage && remainingScrollTop < (firstPage.height/3)) {
-		} else if (firstPage && remainingScrollTop < (viewportHeight)) {
+		} else if (firstPage && remainingScrollTop < (viewportHeight/3)) {
 			//if (secondLastPage && remainingScrollBottom > (lastPage.height + secondLastPage.height)) {
-			if (secondLastPage && remainingScrollBottom > (viewportHeight*2)) {
+			if (pageCount>10&& secondLastPage && remainingScrollBottom > (viewportHeight)) {
 				this.__unloadPage(lastPage.id);
 			} else {
 				this.__loadPrevPage();
