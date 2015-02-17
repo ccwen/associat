@@ -12,3 +12,5 @@ div[contenteditable=true] > div {
   padding: 0;
 }
 
+
+.scrollsyntag {height:400px;overflow-y:auto;}

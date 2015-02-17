@@ -8,13 +8,7 @@ var Perdb=React.createClass({
 	,render:function(){
 		//need clearfix here
 		return <div className="clearfix">
-		    <div className="col-sm-5">
-		    	<h3>{this.props.db}</h3>
-		    	<Container_link db={this.props.db}/>
-			</div>
-			<div className="col-sm-5">
 				<Container_textview db={this.props.db}/>
-			</div>
 		</div>
 	}
 });

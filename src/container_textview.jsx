@@ -1,17 +1,28 @@
 var React=require("react");
 var dragobject=require("./drag");
+var ScrollSyntag=require("./scrollsyntag");
+var kde=require("ksana-database");
 var Container_textview=React.createClass({
 	propTypes:{
 		db:React.PropTypes.string.isRequired
 	}
 	,getInitialState:function() {
-		return {selected:0,db:this.props.db,tabid:["id1","id2"],titles:["t1","t2"],texts:["text1","text2"]}
+		return {selected:0,db:this.props.db,tabid:["id1"],titles:["t1"],texts:["text1"]}
+	}
+	,componentDidMount:function() {
+		kde.open(this.state.db,function(err,handle){
+			this.setState({handle:handle});
+		},this);
 	}
 	,renderTabContent:function(text,n){
 		var id=this.props.db+"_"+this.state.tabid[n];
 		var extra="fade";
+		if (!this.state.handle) return;
+
 		if (n==this.state.selected)  extra=" active";
-		return <div className={"tab-pane "+extra} key={"content"+id} id={id}>{text}</div>
+		return <div className={"scrollsyntag tab-pane "+extra} key={"content"+id} id={id}>
+			<ScrollSyntag db={this.state.handle} />
+		</div>
 	}
 	,renderTabNav:function(tab,n){
 		var id=this.props.db+"_"+this.state.tabid[n];
