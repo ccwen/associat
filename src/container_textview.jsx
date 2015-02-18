@@ -34,17 +34,17 @@ var Container_textview=React.createClass({
 		if (dragobject.dragging) return;
 		dragobject.from=e.target;
 		var range = window.getSelection().getRangeAt(0);
-		if (range) {
+		var start=range.startContainer.parentElement.dataset.vpos;
+		var end=range.endContainer.parentElement.dataset.vpos;
+		if (start && end && range) {
 			dragobject.seg=1;
-			dragobject.start=range.startOffset; //need to get span  vpos
-			dragobject.len=range.endOffset-range.startOffset //need to get span vpos
+			dragobject.start= parseInt(start);
+			dragobject.len=parseInt(end)-dragobject.start;
 			dragobject.dragging=true;	
 		}
-		console.log("drag start")
 	}
 	,dragend:function(e) {
 		dragobject.dragging=false;
-		console.log("drag stop")
 	}
 	,render:function(){
 		return <div>

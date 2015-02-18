@@ -112,7 +112,7 @@ var Container_propedit=React.createClass({
 		}
 	}
 	,oninput:function(e) {
-		var body=thsidi.srefs.body.getDOMNode();
+		var body=this.refs.body.getDOMNode();
 		editing_rel=html2pcode(body.children[0],editing_rel);
 		console.log(editing_rel)
 	}
