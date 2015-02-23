@@ -1,4 +1,5 @@
 var React=require("react");
+var action_syntag=require("./action_syntag");
 //var testdata=require("./propedit_testdata");
 //var editing_rel=testdata.forward[1];
 //number , a span
@@ -6,14 +7,15 @@ var React=require("react");
 //string , normal text
 var E=React.createElement;
 var relations={
-	516:[{caption:"引用"}]
+	145153:[{caption:"18段"}]
+	,516:[{caption:"引用"}]
 	,1024:[{caption:"R4"},"aaa",517,"bb"]
 	,517:[{caption:"引用2"}]
 	,768:[{caption:"R3"},"xxxx",1024,"qqqq"]
 	,256: [ {caption:"R2"} ,"c1", 516, "c2", 768]
 	,512: [{caption:"R1"} ,"b1", 256 , "b2",256]
 }
-var editing_rel=[{caption:"editing r"}, "a1xyzxyz",512, "qq",516 ,"a2xyzxyz"];
+var editing_rel=[{caption:"editing r"}, "a1xyzxyz",512, "qq",516 ,"a2xyzxyz", 145153];
 //var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
 var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
 var textstyle={cursor:"auto"};
@@ -53,8 +55,8 @@ var Relation=React.createClass({
 						children,extra);
 	}
 	,openpnode:function(e) {
-		var pcode=e.target.dataset.pcode
-		console.log("open pnode",pcode);
+		var pcode=e.target.dataset.pcode;
+		action_syntag.goSegByVpos("ds",Math.floor(pcode/256));
 	}
 	,renderItem:function(item,idx) {
 		if (idx==0) return;
@@ -145,7 +147,7 @@ var Container_propedit=React.createClass({
 		if (range.startContainer.nodeName!=="#text") return;
 		var at=range.startOffset;
 		var data = e.dataTransfer.getData("text");
-		relations.add
+		//relations.add
 		var n=parseInt(range.startContainer.parentNode.dataset.n);
 		if (n) this.addSpan(n,at,data)
 		dragobject.dragging=false;		

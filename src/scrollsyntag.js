@@ -2,9 +2,11 @@ var React=require("react");
 var kse=require("ksana-search");
 var ScrollPagination = require("./scrollpagination").ScrollPagination;
 var Page = require("./scrollpagination").ScrollPaginationPage;
-
+var store_syntag=require("./store_syntag");
+var Reflux=require("reflux");
 var ScrollSyntag=React.createClass({
-	getInitialState:function() {
+	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag")]
+	,getInitialState:function() {
 		var pages=[];
 		var segcount=this.props.db.get("meta").segcount;
 		for (var i = 0; i < segcount-1; i++) {
@@ -56,39 +58,47 @@ var ScrollSyntag=React.createClass({
 		var pages=this.state.pages;
 		return (this.loadedPages[0] !== pages[0]);
 	}
+	,goToPage:function(nseg) {
+		var pages=this.state.pages;
+		this.loadedPages=[];
+		this.loadPage(pages[nseg]);
+	}
+	,loadPage:function(page,prev) {
+		this.getPageText(page.id,function(data,segname){
+			setTimeout(function(){
+				page.data=data;
+				page.segname=segname;
+				if (prev) {
+					this.loadedPages.unshift(page);
+					this.setState({hasPrevPage: this.hasPrevPage()});
+				} else {
+					this.loadedPages.push(page);
+					this.setState({hasNextPage: this.hasNextPage()});					
+				}
+			}.bind(this),1);
+		},this);		
+	}
 	,loadNextPage : function () {
-
 		var pages=this.state.pages;
 		var lastLoadedPage = this.loadedPages[this.loadedPages.length-1];
 		var index = pages.indexOf(lastLoadedPage);
 		var page = pages[index+1];
 		if (!page) return false;
-
-		this.getPageText(page.id,function(data,segname){
-			setTimeout(function(){
-				page.data=data;
-				page.segname=segname;
-				this.loadedPages.push(page);
-				this.setState({hasNextPage: this.hasNextPage()});
-			}.bind(this),1);
-		},this);
+		this.loadPage(page);
 		return true;//set loadingNextPage flag
 	}
+	,onStoreSyntag:function(db,seg) {
+		if (db!=this.props.db.dbname) return;
+		this.goToPage(seg);
+	}
+
 	,loadPrevPage : function () {
 		var pages=this.state.pages;
 		var firstLoadedPage = this.loadedPages[0];
 		var index = pages.indexOf(firstLoadedPage);
 		var page = pages[index-1];
 		if (!page) return false;
-
-		this.getPageText(page.id,function(data,segname){
-			setTimeout(function(){
-				page.data=data;
-				page.segname=segname;
-				this.loadedPages.unshift(page);
-				this.setState({hasPrevPage: this.hasPrevPage()});
-			}.bind(this),1);
-		},this);
+		this.loadPage(page,true);
 		return true;//set loadingPrevPage flag
 	}
 	,unloadPage : function (pageId) {
