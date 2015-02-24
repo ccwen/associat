@@ -7,10 +7,10 @@
 .selected_link {background-color: highlight}
 .pinned_link {}
 .btnpinlink {cursor:pointer}
-
+.dragging {background-color: yellow}
+.closebutton:hover {color:white;text-decoration: none; border-radius:50%; background-color: Salmon}
 div[contenteditable=true] > div {
   padding: 0;
 }
-
 
 .scrollsyntag {height:400px;overflow-y:auto;}

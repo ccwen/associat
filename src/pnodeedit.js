@@ -1,5 +1,6 @@
 var React=require("react");
 var action_syntag=require("./action_syntag");
+var action_pnode=require("./action_pnode");
 //var testdata=require("./propedit_testdata");
 //var editing_rel=testdata.forward[1];
 //number , a span
@@ -105,7 +106,7 @@ var html2pcode=function(div,old) {
 	}
 	return out;
 }
-var Container_propedit=React.createClass({
+var PNodeEdit=React.createClass({
 	toggleedit:function(e) {
 		var body=this.refs.body.getDOMNode();
 		body.contentEditable=body.contentEditable!=="true"?"true":"false";
@@ -141,8 +142,13 @@ var Container_propedit=React.createClass({
 		}
 		this.forceUpdate();
 	}
+	,reldragend:function(e) {
+		e.target.classList.remove("dragging");
+	}
 	,drop:function(e) {
 		e.preventDefault();
+		/* prevent drop on same relation*/
+
 		var range=document.caretRangeFromPoint(e.clientX,e.clientY);
 		if (range.startContainer.nodeName!=="#text") return;
 		var at=range.startOffset;
@@ -153,19 +159,29 @@ var Container_propedit=React.createClass({
 		dragobject.dragging=false;		
 	}
 	,allowdrop:function(e) {
-		if (!e.target!=this.refs.body.getDOMNode()) {
+		if (e.target!=this.refs.body.getDOMNode()) {
 			e.stopPropagation();
 			return;
 		}
 	}
+	,reldragstart:function(e) {
+		console.log("rel dragstart");
+    	e.dataTransfer.setData("text", "QQQ");
+    	e.target.classList.add("dragging");
+    	this.dragging=e.target;
+	}
 	,componentDidMount:function() {
 		this.refs.body.getDOMNode().contentEditable="true";
+	}
+	,close:function() {
+		action_pnode.closePNode(this.props.data);
 	}
 	,render:function(){
 		return <div className="panel panel-default">
 			<div className="panel-heading">
-				<h3 className="panel-title">{editing_rel[0].caption}
-					<input type="checkbox" onClick={this.toggleedit} className="pull-right btn btn-xs btn-warning"/>
+				<h3 className="panel-title" >
+				    <span draggable="true" onDragEnd={this.reldragend} onDragStart={this.reldragstart}>{editing_rel[0].caption}</span>
+					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
 				</h3>				
 			</div>
 			<div ref="body" onPaste={this.onpaste} onInput={this.oninput} onDrop={this.drop} 
@@ -177,4 +193,4 @@ var Container_propedit=React.createClass({
 		</div>
 	}
 });
-module.exports=Container_propedit;
+module.exports=PNodeEdit;

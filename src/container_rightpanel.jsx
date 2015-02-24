@@ -1,13 +1,17 @@
 var React=require("react");
-var Container_propedit=require("./container_propedit.jsx");
+var Container_pnodeedit=require("./container_pnodeedit.jsx");
 var Container_selection=require("./container_selection.jsx");
 var Container_controlpanel=require("./container_controlpanel.jsx");
+var styles={
+	height:"100%"
+	,overflowY:"auto"
+}
 var Container_rightpanel=React.createClass({
 	render:function(){
-		return <div>
+		return <div style={styles} >
 			<Container_controlpanel/>
 			<Container_selection/>
-			<Container_propedit/>
+			<Container_pnodeedit/>
 		</div>
 	}
 });
