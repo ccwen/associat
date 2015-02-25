@@ -5,6 +5,7 @@ var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
 var store_relation=require("./store_relation");
 var action_syntag=require("./action_syntag");
 var action_relation=require("./action_relation");
+var RelationTextEdit=require("./relation_textedit.jsx");
 var MAXVISIBLEDEPTH=4;
 var E=React.createElement;
 
@@ -53,7 +54,7 @@ var Relation=React.createClass({
 
 		}
 		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
-		return E("span",{"data-pcode":pcode,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
+		return E("span",{"data-pcode":pcode,"data-n":idx,draggable:true,key:"k"+idx,contentEditable:false,readOnly:true}
 						, expander, extra,
 						children,extra);
 	}
@@ -76,13 +77,23 @@ var Relation=React.createClass({
 			this.setCaretPos(this.props.caretPos);
 		}
 	}
+	,edittext:function(e) {
+		this.setState({editing:parseInt(e.target.dataset.n)});
+	}
+	,doneedit:function(text) {
+		this.props.rel[this.state.editing]=text;
+		this.setState({editing:-1});
+	}
 	,renderItem:function(item,idx) {
 		if (idx==0) return;
 //dangerouslySetInnerHTML={{__html:item}}/>	
 		if (typeof item=="string") {
 			item=item.replace(/\n/g,"<br/>");
-			return <span key={"k"+idx} data-n={idx} style={textstyle} >{item}</span>
-
+			if (this.state.editing==idx) {
+				return <RelationTextEdit key={"k"+idx} text={item} onFinish={this.doneedit}/>
+			} else {
+				return <span onClick={this.edittext} key={"k"+idx} data-n={idx} style={textstyle} >{item}</span>	
+			}
 		} else if (typeof item==="number") {
 			var opened=false;
 			if (item<0) opened=true;
@@ -96,10 +107,10 @@ var Relation=React.createClass({
 					//final node, a span or a rel depth > MAXVISIBLEDEPTH
 
 					return E("span",{"data-pcode":item,"data-n":idx,style:spanbtnstyle,
-						key:"k"+idx,onClick:this.openpnode, contentEditable:false,readOnly:true},rel[0].caption);
+						key:"k"+idx,onClick:this.openpnode, draggable:true,contentEditable:false,readOnly:true},rel[0].caption);
 				}
 			} else {
-				return E("span",{key:"k"+idx,"data-pcode":item,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},Math.abs(item));
+				return E("span",{key:"k"+idx,"data-pcode":item, draggable:true,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},Math.abs(item));
 			}
 		}
 	}

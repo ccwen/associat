@@ -11,7 +11,7 @@ var Relation=require("./embedded_relation.jsx");
 var E=React.createElement;
 var store_relation=require("./store_relation");
 var RelationDropdown=require("./relation_dropdown.jsx");
-var editing_rel=[{caption:"editing r"}, "a",512, "b",512, "c", 516 ,"d", 145153];
+var editing_rel=[{caption:"editing r"}, 512, "b",512, "c", 516 ,"d", 145153,"x"];
 //var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
 var dragobject=require("./drag");
 
@@ -35,75 +35,6 @@ var PNodeEdit=React.createClass({
 	getInitialState:function() {
 		return {caretPos:0}
 	}
-	,onblur:function(e) {
-		console.log("onblur")
-		this.forceUpdate();
-	}
-
-	,keydown:function(e) {
-		var r=window.getSelection().getRangeAt(0);
-		var backspacing=(e.key=="Backspace");
-		var deleting=(e.key=="Delete");
-		var enter=(e.key=="Enter");
-		if (enter) {
-			e.preventDefault();
-			return;
-		}
-
-
-		if ((backspacing || deleting ) && (r.startContainer!=r.endContainer || r.startOffset!=r.endOffset)) {
-			e.preventDefault();
-			return;
-		}
-
-		var n=parseInt(r.startContainer.parentElement.dataset.n);
-
-		if (backspacing && r.startOffset==0 && n>1 && typeof editing_rel[n-1]!="string"){
-			editing_rel.splice(n-1,1);
-			this.setState({caretPos:n-2});
-			e.preventDefault();
-			console.log(editing_rel)
-			return ;
-		}
-
-
-		if (deleting && r.startOffset==r.startContainer.data.length && n<editing_rel.length
-			 && typeof editing_rel[n-1]!="string") {
-			editing_rel.splice(n+1,1);
-			this.setState({caretPos:n});
-			e.preventDefault();
-			console.log(editing_rel)
-			return ;			
-		}
-	}
-	,keyup:function(e) {
-		var r=window.getSelection().getRangeAt(0);
-		var nav=( ["ArrowRight","ArrowLeft","ArrowUp","ArrowDown"].indexOf(e.key)>-1);
-		if (r.startContainer!=r.endContainer || r.startOffset!=r.endOffset) {
-			if (!nav)e.preventDefault();
-		}
-
-
-	}
-	,oninput:function(e) {
-		var editor=this.refs.body.getDOMNode();
-		
-		editing_rel=html2pcode(editor.children[0],editing_rel);
-		if (editing_rel.length==1) {
-			editing_rel.push("empty relation");
-			this.forceUpdate();
-		}
-		console.log(editing_rel)
-	}
-	,oncut:function(e) {
-		e.preventDefault();
-	}
-	,onpaste:function(e) {
-		console.log("paste");
-    	var text = e.clipboardData.getData("text/plain");
-    	document.execCommand("insertHTML", false, text);		
-		e.preventDefault();
-	}
 	,addSpan:function(n,at,text) {
 		var s=editing_rel[n];
 		var span=dragobject.start*256+dragobject.len;
@@ -123,6 +54,9 @@ var PNodeEdit=React.createClass({
 	}
 	,reldragend:function(e) {
 		e.target.classList.remove("dragging");
+	}
+	,keydown:function(e) {
+		e.preventDefault();
 	}
 	,drop:function(e) {
 		e.preventDefault();
