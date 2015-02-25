@@ -3,7 +3,11 @@ var kse=require("ksana-search");
 var ScrollPagination = require("./scrollpagination").ScrollPagination;
 var Page = require("./scrollpagination").ScrollPaginationPage;
 var store_syntag=require("./store_syntag");
+var Relation=require("./embedded_relation.jsx");
+
 var Reflux=require("reflux");
+var editing_rel=[{caption:"inline"}, "xx",512, "yy",516 ,"zz", 145153];
+var E=React.createElement;
 var ScrollSyntag=React.createClass({
 	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag")]
 	,getInitialState:function() {
@@ -32,10 +36,10 @@ var ScrollSyntag=React.createClass({
 			hasPrevPage: this.hasPrevPage,
 		}, this.loadedPages.map(function (page, index) {
 			var spans=page.data.map(function (item,idx) {
-				return React.createElement('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);
+				return React.createElement('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
 			});
 
-			spans.unshift(<span>{page.id}</span>);
+			spans.unshift(<span key="pageid">{page.id}</span>);
 			return React.createElement(Page, { key: page.id, id:page.id,
 				onPageEvent: this.__handlePageEvent},spans	)
 		}.bind(this)));

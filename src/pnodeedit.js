@@ -1,105 +1,30 @@
+var Reflux=require("reflux");
 var React=require("react");
-var action_syntag=require("./action_syntag");
 var action_pnode=require("./action_pnode");
+var action_relation=require("./action_relation");
+var Relation=require("./embedded_relation.jsx");
 //var testdata=require("./propedit_testdata");
 //var editing_rel=testdata.forward[1];
 //number , a span
 //object , a rel
 //string , normal text
 var E=React.createElement;
-var relations={
-	145153:[{caption:"18段"}]
-	,516:[{caption:"引用"}]
-	,1024:[{caption:"R4"},"aaa",517,"bb"]
-	,517:[{caption:"引用2"}]
-	,768:[{caption:"R3"},"xxxx",1024,"qqqq"]
-	,256: [ {caption:"R2"} ,"c1", 516, "c2", 768]
-	,512: [{caption:"R1"} ,"b1", 256 , "b2",256]
-}
-var editing_rel=[{caption:"editing r"}, "a1xyzxyz",512, "qq",516 ,"a2xyzxyz", 145153];
+var store_relation=require("./store_relation");
+var RelationDropdown=require("./relation_dropdown.jsx");
+var editing_rel=[{caption:"editing r"}, "a",512, "b",512, "c", 516 ,"d", 145153];
 //var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
-var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
-var textstyle={cursor:"auto"};
 var dragobject=require("./drag");
-var MAXVISIBLEDEPTH=4;
 
-var styleFromDepth=function(depth) {
-	var out={};
-	if (depth) {
-		out.padding = (MAXVISIBLEDEPTH-depth)*2+"px";
-		out.border="dotted 1px";
-		out.borderRadius="5px";
-	}
-	return out;
-}
 
-var Relation=React.createClass({
-	openRel:function(e) {
-		this.props.rel[e.target.parentNode.dataset.n]=-this.props.rel[e.target.parentNode.dataset.n];
-		e.stopPropagation();
-		this.forceUpdate();
-	}
-	,renderRel:function(rel,opened,pcode,idx) {
-		var children=null,extra=null;
-		var rcaption=rel[0].caption;
-		if (opened){
-			extra=" ",
-			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
-			children=E(Relation,{depth:this.props.depth+1, rel:rel} );
-		} else {
-			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px blue"};
-
-		}
-		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
-		return E("span",{"data-pcode":pcode,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
-						, expander, extra,
-						children,extra);
-	}
-	,openpnode:function(e) {
-		var pcode=e.target.dataset.pcode;
-		action_syntag.goSegByVpos("ds",Math.floor(pcode/256));
-	}
-	,renderItem:function(item,idx) {
-		if (idx==0) return;
-
-		if (typeof item=="string") {
-			item=item.replace(/\n/g,"<br/>");
-			return <span key={"k"+idx} data-n={idx} style={textstyle} 
-				dangerouslySetInnerHTML={{__html:item}}/>	
-		} else if (typeof item==="number") {
-			var opened=false;
-			if (item<0) opened=true;
-			var rel=relations[Math.abs(item)];
-			var extra=null,children=null;
-			var expander=null;
-			if (rel) {
-				if (Math.abs(item)%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
-					return this.renderRel(rel,opened,item,idx);
-				} else {
-					//final node, a span or a rel depth > MAXVISIBLEDEPTH
-
-					return E("span",{"data-pcode":item,"data-n":idx,style:spanbtnstyle,
-						key:"k"+idx,onClick:this.openpnode, contentEditable:false,readOnly:true},rel[0].caption);
-				}
-			} else {
-				return E("span",{key:"k"+idx,"data-pcode":item,"data-n":idx,"style":spanbtnstyle},Math.abs(item));
-			}
-		}
-	}
-	,render:function(){
-		return <span style={styleFromDepth(this.props.depth)}>
-		{this.props.rel.map(this.renderItem)}
-		</span>
-	}
-	
-});
 var html2pcode=function(div,old) {
-	var nodes=div.children;
+	var nodes=div.childNodes;
 	var out=[ old[0] ];
 	for (var i=0;i<nodes.length;i++) {
 		var node=nodes[i];
-		if (node.dataset.pcode) {
-				out.push(parseInt(node.dataset.pcode));
+		if (node.dataset && node.dataset.pcode) {
+			out.push(parseInt(node.dataset.pcode));
+		} else if (node.nodeName=="#text") {
+			out.push(node.nodeValue);
 		} else {
 			out.push(node.innerText);
 		}
@@ -107,17 +32,71 @@ var html2pcode=function(div,old) {
 	return out;
 }
 var PNodeEdit=React.createClass({
-	toggleedit:function(e) {
-		var body=this.refs.body.getDOMNode();
-		body.contentEditable=body.contentEditable!=="true"?"true":"false";
-		if (body.contentEditable==="true") {
-			body.focus();
+	getInitialState:function() {
+		return {caretPos:0}
+	}
+	,onblur:function(e) {
+		console.log("onblur")
+		this.forceUpdate();
+	}
+
+	,keydown:function(e) {
+		var r=window.getSelection().getRangeAt(0);
+		var backspacing=(e.key=="Backspace");
+		var deleting=(e.key=="Delete");
+		var enter=(e.key=="Enter");
+		if (enter) {
+			e.preventDefault();
+			return;
+		}
+
+
+		if ((backspacing || deleting ) && (r.startContainer!=r.endContainer || r.startOffset!=r.endOffset)) {
+			e.preventDefault();
+			return;
+		}
+
+		var n=parseInt(r.startContainer.parentElement.dataset.n);
+
+		if (backspacing && r.startOffset==0 && n>1 && typeof editing_rel[n-1]!="string"){
+			editing_rel.splice(n-1,1);
+			this.setState({caretPos:n-2});
+			e.preventDefault();
+			console.log(editing_rel)
+			return ;
+		}
+
+
+		if (deleting && r.startOffset==r.startContainer.data.length && n<editing_rel.length
+			 && typeof editing_rel[n-1]!="string") {
+			editing_rel.splice(n+1,1);
+			this.setState({caretPos:n});
+			e.preventDefault();
+			console.log(editing_rel)
+			return ;			
 		}
 	}
+	,keyup:function(e) {
+		var r=window.getSelection().getRangeAt(0);
+		var nav=( ["ArrowRight","ArrowLeft","ArrowUp","ArrowDown"].indexOf(e.key)>-1);
+		if (r.startContainer!=r.endContainer || r.startOffset!=r.endOffset) {
+			if (!nav)e.preventDefault();
+		}
+
+
+	}
 	,oninput:function(e) {
-		var body=this.refs.body.getDOMNode();
-		editing_rel=html2pcode(body.children[0],editing_rel);
+		var editor=this.refs.body.getDOMNode();
+		
+		editing_rel=html2pcode(editor.children[0],editing_rel);
+		if (editing_rel.length==1) {
+			editing_rel.push("empty relation");
+			this.forceUpdate();
+		}
 		console.log(editing_rel)
+	}
+	,oncut:function(e) {
+		e.preventDefault();
 	}
 	,onpaste:function(e) {
 		console.log("paste");
@@ -129,15 +108,15 @@ var PNodeEdit=React.createClass({
 		var s=editing_rel[n];
 		var span=dragobject.start*256+dragobject.len;
 
-		if (!relations[span]) relations[span]=[{caption:text}];
+		//if (!this.state.relations[span]) this.state.relations[span]=[{caption:text}];
 
 		if (at==0) {
-			editing_rel.splice(n-1,0,span);
+			editing_rel.splice(n-1,0,span," ");
 		} else if (at==s.length-1) {
-			editing_rel.splice(n,0,span);
+			editing_rel.splice(n,0,span," ");
 		} else {
 			s2=s.substr(at);
-			editing_rel.splice(n+1,0,span,s2);
+			editing_rel.splice(n+1,0,span," ",s2);
 			editing_rel[n]=s.substr(0,at);
 		}
 		this.forceUpdate();
@@ -172,25 +151,28 @@ var PNodeEdit=React.createClass({
 	}
 	,componentDidMount:function() {
 		this.refs.body.getDOMNode().contentEditable="true";
+		action_relation.getRelations();
 	}
 	,close:function() {
 		action_pnode.closePNode(this.props.data);
 	}
 	,render:function(){
+		//var relationstatic=React.renderToStaticMarkup();
 		return <div className="panel panel-default">
 			<div className="panel-heading">
 				<h3 className="panel-title" >
-				    <span draggable="true" onDragEnd={this.reldragend} onDragStart={this.reldragstart}>{editing_rel[0].caption}</span>
+				    <span draggable="true" onDragEnd={this.reldragend} onDragStart={this.reldragstart} title="dragable">{editing_rel[0].caption}</span>
 					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
+				    <span className="pull-right"><RelationDropdown/></span>
 				</h3>				
 			</div>
-			<div ref="body" onPaste={this.onpaste} onInput={this.oninput} onDrop={this.drop} 
-			onDragOver={this.allowdrop} spellCheck="false" 
-			className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
-				<Relation rel={editing_rel} depth={0}/>
-			</div>
-					
+			<div ref="body" onKeyDown={this.keydown} onKeyUp={this.keyup} onInput={this.oninput} onBlur={this.onblur}
+			 onPaste={this.onpaste} onCut={this.oncut} spellCheck={false}  onDrop={this.drop} onDragOver={this.allowdrop}  
+			 className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
+			 <Relation rel={editing_rel} depth={0} caretPos={this.state.caretPos}/>
+			 </div>
 		</div>
 	}
+	//dangerouslySetInnerHTML={{__html:relationstatic}}/>
 });
 module.exports=PNodeEdit;

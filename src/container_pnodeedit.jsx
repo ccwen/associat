@@ -13,7 +13,7 @@ var Container_pnodeedit=React.createClass({
 		this.setState({pnodes:pnodes});
 	}
 	,renderPnode:function(item,idx){
-		return <PNodeEdit data={item} />
+		return <PNodeEdit key={"i"+idx} data={item} />
 	}
 	,newrelation:function() {
 		action_pnode.createPNode();

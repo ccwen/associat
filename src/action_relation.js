@@ -1,5 +1,6 @@
-var Reflux=require("reflux");
-Reflux.createActions([
+action_relation=require("reflux").createActions([
 	"getRelations"
 	,"setRelations"
 ]);
+
+module.exports=action_relation;
