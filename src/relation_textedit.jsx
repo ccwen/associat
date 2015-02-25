@@ -7,9 +7,12 @@ var Relation_text_editor=React.createClass({
 
 	,onkeypress:function(e) {
 		if (e.key=="Enter") {
-			this.props.onFinish(e.target.value.trim()||" ");
+			this.finish(e);
 			e.preventDefault();
 		}
+	}
+	,finish:function(e) {
+		this.props.onFinish(e.target.value.trim()||" ");
 	}
 	,onkeydown:function(e) {
 		e.stopPropagation();
@@ -21,7 +24,7 @@ var Relation_text_editor=React.createClass({
 	,render:function() {
 		var size=this.props.text.length;
 		if (size<4) size=4;
-		return <input size={size} onKeyDown={this.onkeydown} defaultValue={this.props.text} onKeyPress={this.onkeypress} />
+		return <input onBlur={this.finish} size={size} onKeyDown={this.onkeydown} defaultValue={this.props.text} onKeyPress={this.onkeypress} />
 	}
 });
 

@@ -90,12 +90,19 @@ var PNodeEdit=React.createClass({
 	,close:function() {
 		action_pnode.closePNode(this.props.data);
 	}
+	,captionkeydown:function(e) {
+		if (e.key=="Enter") {
+			editing_rel[0].caption=e.target.innerText.substring(0,10);
+			e.preventDefault();
+			this.forceUpdate();
+		}
+	}
 	,render:function(){
 		//var relationstatic=React.renderToStaticMarkup();
 		return <div className="panel panel-default">
 			<div className="panel-heading">
-				<h3 className="panel-title" >
-				    <span draggable="true" onDragEnd={this.reldragend} onDragStart={this.reldragstart} title="dragable">{editing_rel[0].caption}</span>
+				<h3 className="panel-title" draggable="true" onDragEnd={this.reldragend} onDragStart={this.reldragstart} >
+				    <span onKeyDown={this.captionkeydown} contentEditable={true} title="dragable">{editing_rel[0].caption}</span>
 					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
 				    <span className="pull-right"><RelationDropdown/></span>
 				</h3>				

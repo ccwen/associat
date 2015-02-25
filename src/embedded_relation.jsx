@@ -45,6 +45,7 @@ var Relation=React.createClass({
 	,renderRel:function(rel,opened,pcode,idx) {
 		var children=null,extra=null;
 		var rcaption=rel[0].caption;
+		var draggable=this.props.depth==0;
 		if (opened){
 			extra=" ",
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
@@ -54,7 +55,7 @@ var Relation=React.createClass({
 
 		}
 		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
-		return E("span",{"data-pcode":pcode,"data-n":idx,draggable:true,key:"k"+idx,contentEditable:false,readOnly:true}
+		return E("span",{"data-pcode":pcode,"data-n":idx,draggable:draggable,key:"k"+idx,contentEditable:false,readOnly:true}
 						, expander, extra,
 						children,extra);
 	}
@@ -89,7 +90,7 @@ var Relation=React.createClass({
 //dangerouslySetInnerHTML={{__html:item}}/>	
 		if (typeof item=="string") {
 			item=item.replace(/\n/g,"<br/>");
-			if (this.state.editing==idx) {
+			if (this.state.editing==idx && this.props.depth==0) {
 				return <RelationTextEdit key={"k"+idx} text={item} onFinish={this.doneedit}/>
 			} else {
 				return <span onClick={this.edittext} key={"k"+idx} data-n={idx} style={textstyle} >{item}</span>	
@@ -100,6 +101,7 @@ var Relation=React.createClass({
 			var rel=this.state.relations[Math.abs(item)];
 			var extra=null,children=null;
 			var expander=null;
+			var draggable=this.props.depth==0;
 			if (rel) {
 				if (Math.abs(item)%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
 					return this.renderRel(rel,opened,item,idx);
@@ -107,10 +109,10 @@ var Relation=React.createClass({
 					//final node, a span or a rel depth > MAXVISIBLEDEPTH
 
 					return E("span",{"data-pcode":item,"data-n":idx,style:spanbtnstyle,
-						key:"k"+idx,onClick:this.openpnode, draggable:true,contentEditable:false,readOnly:true},rel[0].caption);
+						key:"k"+idx,onClick:this.openpnode, draggable:draggable,contentEditable:false,readOnly:true},rel[0].caption);
 				}
 			} else {
-				return E("span",{key:"k"+idx,"data-pcode":item, draggable:true,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},Math.abs(item));
+				return E("span",{key:"k"+idx,"data-pcode":item, draggable:draggable,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},Math.abs(item));
 			}
 		}
 	}
