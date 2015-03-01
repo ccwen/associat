@@ -1,15 +1,13 @@
 var React=require("react");
-//var kse=require("ksana-search");
-
-var Container_perdb=require("./container_perdb.jsx");
-var Container_rightPanel=require("./container_rightPanel.jsx");
-var PNodeList=require("./pnodelist");
+var LeftTabs=require("./lefttabs.jsx");
+var MiddlePanel=require("./middlepanel.jsx");
+var RightPanel=require("./rightpanel.jsx");
 var maincomponent = React.createClass({
   render: function() {
     return <div>
-      <div className="col-md-3"><PNodeList/></div>
-      <div className="col-md-6"><Container_perdb/></div>
-      <div className="col-md-3"><Container_rightPanel/></div>
+      <div className="col-md-3"><LeftTabs/></div>
+      <div className="col-md-6"><MiddlePanel/></div>
+      <div className="col-md-3"><RightPanel/></div>
     </div>;
   }
 });

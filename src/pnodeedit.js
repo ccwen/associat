@@ -82,6 +82,7 @@ var PNodeEdit=React.createClass({
     	e.dataTransfer.setData("text", "QQQ");
     	e.target.classList.add("dragging");
     	this.dragging=e.target;
+    	
 	}
 	,componentDidMount:function() {
 		this.refs.body.getDOMNode().contentEditable="true";
@@ -101,7 +102,8 @@ var PNodeEdit=React.createClass({
 		//var relationstatic=React.renderToStaticMarkup();
 		return <div className="panel panel-default">
 			<div className="panel-heading">
-				<h3 className="panel-title" draggable="true" onDragEnd={this.reldragend} onDragStart={this.reldragstart} >
+				<h3 className="panel-title" draggable="true"
+				 onDragEnd={this.reldragend} onDragStart={this.reldragstart} >
 				    <span onKeyDown={this.captionkeydown} contentEditable={true} title="dragable">{editing_rel[0].caption}</span>
 					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
 				    <span className="pull-right"><RelationDropdown/></span>

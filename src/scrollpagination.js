@@ -13,9 +13,9 @@ var findScrollParent = function (el) {
 	return window;
 };
 var React=require("react");
+
 var ScrollPagination =  React.createClass({
 	displayName: "ScrollPagination",
-
 	getDefaultProps: function () {
 		return {
 			hasPrevPage: false,
@@ -37,8 +37,29 @@ var ScrollPagination =  React.createClass({
 
 		this.__updatePageIds();
 		this.__updateDimensions();
+		if (this.props.showCaret) {
+			this.getDOMNode().contentEditable=true;
+			this.getDOMNode().draggable=false;
+		}
 	},
-
+	onkeydown:function(e) {
+		if (this.props.onKeyDown) this.props.onKeyDown(e);
+	},
+	onkeypress:function(e) {
+		if (this.props.onKeyPress) this.props.onKeyPress(e);
+	},
+	onkeyup:function(e) {
+		if (this.props.onKeyUp) this.props.onKeyUp(e);
+	},
+	preventdefault:function(e) {
+		e.preventDefault();
+	},
+	oncopy:function(e) {
+		if (this.props.onCopy) this.props.onCopy(e);
+	},
+	ondrop:function(e) {
+		if (this.props.onDrop) 	this.props.onDrop(e);
+	},
 	componentDidUpdate: function () {
 		this.__updatePageIds();
 		this.__updateDimensions();
@@ -54,7 +75,6 @@ var ScrollPagination =  React.createClass({
 		scrollParent.removeEventListener("scroll", this.__handleScroll, false);
 		scrollParent.removeEventListener("resize", this.__handleResize, false);
 	},
-
 	render: function () {
 		var style = {};
 		if (this.__paddingTop) {
@@ -62,7 +82,14 @@ var ScrollPagination =  React.createClass({
 		}
 		return React.createElement('div', {
 			style: style,
-			ref: "wrapper"
+			ref: "wrapper",
+			onDrop:this.ondrop,
+			onKeyDown:this.onkeydown,
+			onKeyUp:this.onkeyup,
+			onKeyPress:this.onkeypress,
+			onCut:this.preventdefault,
+			onPaste:this.preventdefault,
+			onCopy:this.oncopy
 		}, this.props.children);
 	},
 

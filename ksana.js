@@ -1,16 +1,42 @@
 jsonp_handler({
  "version": "1",
- "build": 658,
+ "build": 955,
  "title": "associat",
  "minruntime": 1,
  "baseurl": "http://yapcheahshen@rawgit.com/ksanaforge/associat/master/",
  "description": "",
+ "databases": {
+  "ds": {
+   "caption": "金剛經",
+   "panel": "default"
+  },
+  "dsl_jwn": {
+   "caption": "江味農講義",
+   "panel": "primary"
+  },
+  "moedict": {
+   "caption": "教育部國語辭典",
+   "panel": "success"
+  },
+  "openlit": {
+   "caption": "開放文學",
+   "panel": "info"
+  },
+  "cbeta": {
+   "caption": "CBETA大藏經",
+   "panel": "warning"
+  }
+ },
  "browserify": {
   "external": [
    "react",
    "bootstrap",
+   "reflux",
    "ksana-search",
-   "ksana-database"
+   "ksana-database",
+   "ksana-reflux",
+   "ksana-analyzer",
+   "ksana-jsonrom"
   ]
  },
  "files": [
@@ -29,11 +55,11 @@ jsonp_handler({
  ],
  "filesizes": [
   588,
-  720,
-  109716,
+  759,
+  50228,
   277980,
   625422,
-  1065,
+  1517,
   35601,
   113498,
   50141532,
@@ -43,11 +69,11 @@ jsonp_handler({
  ],
  "filedates": [
   "2015-02-17T17:31:18.469Z",
-  "2015-02-24T16:45:39.964Z",
-  "2015-02-24T16:54:30.920Z",
+  "2015-02-25T15:12:11.051Z",
+  "2015-03-01T17:41:04.153Z",
   "2015-02-07T15:57:54.424Z",
   "2015-02-07T15:57:54.498Z",
-  "2015-02-24T16:54:00.306Z",
+  "2015-03-01T17:05:06.900Z",
   "2015-02-07T15:57:54.374Z",
   "2015-02-07T15:57:54.358Z",
   "2015-01-07T07:29:27.077Z",
@@ -55,5 +81,5 @@ jsonp_handler({
   "2015-01-25T17:03:03.899Z",
   "2015-01-25T16:33:44.816Z"
  ],
- "date": "2015-02-24T16:54:31.892Z"
+ "date": "2015-03-01T17:41:05.143Z"
 })

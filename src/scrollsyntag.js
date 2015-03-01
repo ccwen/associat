@@ -10,6 +10,7 @@ var editing_rel=[{caption:"inline"}, "xx",512, "yy",516 ,"zz", 145153];
 var E=React.createElement;
 var ScrollSyntag=React.createClass({
 	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag")]
+	,allowkeys:["ArrowRight","ArrowLeft","ArrowUp","ArrowDown","PageUp","PageDown"]
 	,getInitialState:function() {
 		var pages=[];
 		var segcount=this.props.db.get("meta").segcount;
@@ -26,6 +27,17 @@ var ScrollSyntag=React.createClass({
 	,componentDidMount:function(){
 		this.loadNextPage();
 	}
+	,oncopy:function(e) {
+		console.log("copy");
+	}
+	,onkeydown:function(e) {
+		if (this.allowkeys.indexOf(e.key)>-1 || (e.ctrlKey && e.keyCode===67)) return;
+		e.preventDefault();
+	}
+	,ondrop:function(e) {
+		console.log("drop");
+		e.preventDefault();
+	}
 	,render: function () {
 		return React.createElement(ScrollPagination, {
 			ref: "scrollPagination",
@@ -34,6 +46,10 @@ var ScrollSyntag=React.createClass({
 			unloadPage: this.unloadPage,
 			hasNextPage: this.hasNextPage,
 			hasPrevPage: this.hasPrevPage,
+			onCopy:this.oncopy,
+			onDrop:this.ondrop,
+			onKeyDown:this.onkeydown,
+			showCaret:true,
 		}, this.loadedPages.map(function (page, index) {
 			var spans=page.data.map(function (item,idx) {
 				return React.createElement('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
