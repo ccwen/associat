@@ -5,10 +5,15 @@ var SyntagEdit=React.createClass({
 		db:React.PropTypes.object.isRequired
 		,id:React.PropTypes.string.isRequired
 		,setting:React.PropTypes.object.isRequired
+		,height:React.PropTypes.number
+	}
+	,
+	getDefaultProp:function(){
+		return {height:200}
 	}
 	,render:function() {
 
-		return <div className={"panel panel-"+this.props.setting.panel}>
+		return <div style={{height:this.props.height+"px"}} className={"panel panel-"+this.props.setting.panel}>
 			<div className="panel-heading">
 				<div style={{fontSize:"50%"}}>{this.props.setting.caption}<SyntagControl db={this.props.db} id={this.props.id} /></div>
 			</div>

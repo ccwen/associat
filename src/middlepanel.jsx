@@ -3,10 +3,14 @@ var MiddleControl=require("./middlecontrol.jsx");
 var C_syntagedit=require("./c_syntagedit.jsx");
 
 var MiddlePanel=React.createClass({
-	render:function(){
-		return <div>
-			<MiddleControl/>
-			<C_syntagedit/>		
+	componentDidMount:function() {
+		this.refs.container.getDOMNode().style.height
+		  =this.getDOMNode().offsetHeight-34;
+	}
+	,render:function(){
+		return <div style={{height:"100%"}}>
+			<div ref="controls"><MiddleControl/></div>
+			<div ref="container" style={{overflowY:"auto"}}><C_syntagedit/></div>
 		</div>
 	}
 });

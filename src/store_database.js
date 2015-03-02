@@ -7,7 +7,7 @@ var store_database=Reflux.createStore({
 	,exists:function(db) {
 		for (var i=0;i<this.databases.length;i++) {
 			if (this.databases[i][1]===db) return i;
-		}
+		} 
 		return -1;
 	}
 	,existsKey:function(key) {
@@ -31,9 +31,10 @@ var store_database=Reflux.createStore({
 			this.trigger(this.databases);
 		}
 	}
-	,onOpendb:function(dbname,insertAt) {
+	,onOpendb:function(dbname,scrollto,insertAt) {
 		kde.open(dbname,function(err,db){
 			if (!db) return;
+			scrollto=scrollto||0;
 			var key=db.dbname+".0";
 			if (typeof insertAt=="undefined") { //open freely
 				var at=this.exists(db);
@@ -41,10 +42,10 @@ var store_database=Reflux.createStore({
 					key=this.databases[at][0];
 					this.databases.splice(at,1); //remove opened
 				}
-				this.databases.unshift([key,db]);
+				this.databases.unshift([key,db,scrollto]);
 			} else { //user specified an insert point
 				key=this.getNewKey(dbname);
-				this.databases.splice(insertAt,0,[key,db]);
+				this.databases.splice(insertAt,0,[key,db,scrollto]);
 			}
 			this.trigger(this.databases);
 		},this);

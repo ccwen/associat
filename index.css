@@ -8,6 +8,7 @@
 .pinned_link {}
 .btnpinlink {cursor:pointer}
 .dragging {background-color: yellow}
+.closebutton{color:black;}
 .closebutton:hover {color:white;text-decoration: none; border-radius:50%; background-color: Salmon}
 div[contenteditable=true] > div {
   padding: 0;

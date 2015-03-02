@@ -31,7 +31,7 @@ var DatabaseButtons=React.createClass({
 	,opendb:function(e) {
 		var insertAt;
 		if (e.ctrlKey) insertAt=0;
-		actions.opendb(e.target.name, insertAt );
+		actions.opendb(e.target.name, 0, insertAt );
 	}
 	,renderItem:function(item,idx) {
 		return <button className="btn btn-primary" 
