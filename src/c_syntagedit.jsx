@@ -9,11 +9,14 @@ var C_syntagedit=React.createClass({
 		return {databases:[]};
 	}
 	,onStoreDatabase:function(databases) {
+		console.log(databases);
 		this.setState({databases:databases});
 	}
 	,renderItem:function(item,idx) {
-		var setting=ksana.js.databases[item.dbname];
-		return <SyntagEdit db={item} setting={setting}/>
+		var setting=ksana.js.databases[item[1].dbname];
+		return <div key={item[0]}>
+			<SyntagEdit db={item[1]} setting={setting} id={item[0]}/>
+		</div>
 	}
 	,render:function(){
 		return <div>
