@@ -1,3 +1,10 @@
+/*
+
+  relations in memory, sync access.
+  prefetch from (pouchdb) async
+
+*/
+
 var Reflux=require("reflux");
 var actions=require("./action_relation");
 var relations={
