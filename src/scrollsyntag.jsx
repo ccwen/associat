@@ -6,7 +6,6 @@ var store_syntag=require("./store_syntag");
 var Relation=require("./embedded_relation.jsx");
 
 var Reflux=require("reflux");
-var editing_rel=[{caption:"inline"}, "xx",512, "yy",516 ,"zz", 145153];
 var E=React.createElement;
 var ScrollSyntag=React.createClass({
 	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag")]
@@ -21,6 +20,7 @@ var ScrollSyntag=React.createClass({
 				//items: pageItems("page-"+ (i+1))
 			});
 		}
+		this.loadedPages=[];
 		return {pages:pages};
 	}
 	,loadedPages:[]
@@ -38,34 +38,13 @@ var ScrollSyntag=React.createClass({
 		console.log("drop");
 		e.preventDefault();
 	}
-	,render: function () {
-		return React.createElement(ScrollPagination, {
-			ref: "scrollPagination",
-			loadNextPage: this.loadNextPage,
-			loadPrevPage: this.loadPrevPage,
-			unloadPage: this.unloadPage,
-			hasNextPage: this.hasNextPage,
-			hasPrevPage: this.hasPrevPage,
-			onCopy:this.oncopy,
-			onDrop:this.ondrop,
-			onKeyDown:this.onkeydown,
-			showCaret:true,
-		}, this.loadedPages.map(function (page, index) {
-			var spans=page.data.map(function (item,idx) {
-				return React.createElement('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
-			});
+	
 
-			spans.unshift(<span key="pageid">{page.id}</span>);
-			return React.createElement(Page, { key: page.id, id:page.id,
-				onPageEvent: this.__handlePageEvent},spans	)
-		}.bind(this)));
-	},
-
-	__handlePageEvent: function (pageId, event) {
+	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)
 		this.refs.scrollPagination.handlePageEvent(pageId, event);
-	},
-	getPageText:function(pageId,cb,context) {
+	}
+	,getPageText:function(pageId,cb,context) {
 		kse.highlightSeg(this.props.db,0,pageId,{token:true},function(data){
 			cb.call(context,data.text,data.segname);
 		},this);
@@ -139,8 +118,28 @@ var ScrollSyntag=React.createClass({
 		this.loadedPages = this.loadedPages.slice(0, index).concat(this.loadedPages.slice(index+1, this.loadedPages.length));
 		this.setState({	hasNextPage: this.hasNextPage(),	hasPrevPage: this.hasPrevPage()});
 	}
+	,render: function () {
+		return React.createElement(ScrollPagination, {
+			ref: "scrollPagination",
+			loadNextPage: this.loadNextPage,
+			loadPrevPage: this.loadPrevPage,
+			unloadPage: this.unloadPage,
+			hasNextPage: this.hasNextPage,
+			hasPrevPage: this.hasPrevPage,
+			onCopy:this.oncopy,
+			onDrop:this.ondrop,
+			onKeyDown:this.onkeydown,
+			showCaret:true,
+		}, this.loadedPages.map(function (page, index) {
+			var spans=page.data.map(function (item,idx) {
+				return React.createElement('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
+			});
 
-})
-
+			spans.unshift(<span key="pageid">{page.id}</span>);
+			return React.createElement(Page, { key: page.id, id:page.id,
+				onPageEvent: this.__handlePageEvent},spans	)
+		}.bind(this)));
+	}
+});
 
 module.exports=ScrollSyntag;

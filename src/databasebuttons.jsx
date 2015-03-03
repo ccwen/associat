@@ -34,7 +34,7 @@ var DatabaseButtons=React.createClass({
 		actions.open(e.target.name, 0, insertAt );
 	}
 	,renderItem:function(item,idx) {
-		return <button className="btn btn-primary" 
+		return <button className="btn btn-default" 
 			key={idx} name={item[0]}>{item[1]}</button>
 	}
 	,render:function(){

@@ -2,7 +2,7 @@
 var findScrollParent = function (el) {
 	var ref = el;
 	while (ref) {
-		switch (window.getComputedStyle(ref).overflow) {
+		switch (window.getComputedStyle(ref).overflowY) {
 			case "auto":
 				return ref;
 			case "scroll":
@@ -223,6 +223,7 @@ var ScrollPagination =  React.createClass({
 		var contentHeight = el.offsetHeight;
 
 		var offsetTop = 0;
+		/*  offsetTop must always be 0
 		var ref = el;
 		while (ref) {
 			offsetTop += ref.offsetTop || 0;
@@ -231,7 +232,7 @@ var ScrollPagination =  React.createClass({
 				break;
 			}
 		}
-
+		*/
 		this.__dimentions = {
 			viewportHeight: viewportHeight,
 			contentHeight: contentHeight,

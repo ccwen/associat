@@ -2,8 +2,10 @@ var React=require("react");
 var Reflux=require("reflux");
 var store_database=require("./store_dataview");
 var SyntagEdit=require("./syntagedit.jsx");
-//var ExcerptList=require("./excerptlist.jsx");
+var ExcerptView=require("./excerptview.jsx");
 var minHeight=200;
+var E=React.createElement;
+
 var Syntags=React.createClass({
 	mixins:[Reflux.listenTo(store_database,"onStoreDatabase")]
 	,getInitialState:function() {
@@ -18,10 +20,15 @@ var Syntags=React.createClass({
 	}
 	,renderItem:function(item,idx) {
 		var setting=ksana.js.databases[item[1].dbname];
-
-		return <div key={item[0]}>
-			<SyntagEdit height={this.suggestedHeight} db={item[1]} setting={setting} id={item[0]}/>
-		</div>
+		var dbkey=item[0];
+		var db=item[1];
+		var opts=item[2]||{};
+		var comp=SyntagEdit;
+		if (opts.query) comp=ExcerptView;
+		return E("div",{key:dbkey},
+				E(comp,{db:db,opts:opts,setting:setting,
+						dbkey:dbkey,height:this.suggestedHeight})
+		);
 	}
 	,render:function(){
 		return <div style={{height:"100%"}}>

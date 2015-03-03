@@ -55,10 +55,10 @@ var store_dataview=Reflux.createStore({
 		return -1;		
 	}
 	,getNewKey:function(dbname) {
-		var i=0;
+		var i=Math.random().toString().substr(2,3);
 		do {
-			key=dbname+"."+i;
-			i++;
+			key=dbname+"_"+i;
+			i=Math.random().toString().substr(2,3);
 		} while (this.existsKey(key)>-1) ;
 		return key;
 	}
@@ -77,7 +77,7 @@ var store_dataview=Reflux.createStore({
 				return;
 			}
 			dbopts=dbopts||{};
-			var key=db.dbname+".0";
+			var key=this.getNewKey(dbname);
 			if (typeof insertAt=="undefined") { //open freely
 				var at=this.exists(db);
 				if (at>-1) {
@@ -85,8 +85,7 @@ var store_dataview=Reflux.createStore({
 					this.dataviews.splice(at,1); //remove opened
 				}
 				this.dataviews.unshift([key,db,dbopts]);
-			} else { //user specified an insert point
-				key=this.getNewKey(dbname);
+			} else { //user specified an insert point				
 				this.dataviews.splice(insertAt,0,[key,db,dbopts]);
 			}
 			if (cb) cb.call(this);
