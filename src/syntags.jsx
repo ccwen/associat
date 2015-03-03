@@ -2,8 +2,9 @@ var React=require("react");
 var Reflux=require("reflux");
 var store_database=require("./store_database");
 var SyntagEdit=require("./syntagedit.jsx");
+//var ExcerptList=require("./excerptlist.jsx");
 var minHeight=200;
-var C_syntagedit=React.createClass({
+var Syntags=React.createClass({
 	mixins:[Reflux.listenTo(store_database,"onStoreDatabase")]
 	,getInitialState:function() {
 		return {databases:[]};
@@ -28,4 +29,4 @@ var C_syntagedit=React.createClass({
 		</div>
 	}
 });
-module.exports=C_syntagedit;
+module.exports=Syntags;
