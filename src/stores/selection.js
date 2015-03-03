@@ -68,6 +68,11 @@ var store_selection=Reflux.createStore({
 		this.selections[wid]=selections;
 		actions.clearHighlights();
 		this.trigger(this.selections,wid);
+
+		//remove empty selection after updating views
+		if (selections.length==0) {
+			delete this.selections[wid];
+		}		
 	}
 	,onSetSelections:function(selections) {
 		for (var i in selections) {
