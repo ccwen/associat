@@ -1,6 +1,6 @@
 var React=require("react");
 var Reflux=require("reflux");
-var store_database=require("./store_database");
+var store_database=require("./store_dataview");
 var SyntagEdit=require("./syntagedit.jsx");
 //var ExcerptList=require("./excerptlist.jsx");
 var minHeight=200;

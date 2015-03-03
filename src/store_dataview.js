@@ -1,23 +1,23 @@
 var Reflux=require("reflux");
-var actions=require("./action_database");
+var actions=require("./action_dataview");
 var kde=require("ksana-database");
 var persistent=require("./persistent");
-var store_database=Reflux.createStore({
+var store_dataview=Reflux.createStore({
 	listenables:actions,
-	databases:[]
+	dataviews:[]
 	,_rev:null
 
 	,init:function() {
 		var that=this;
-		persistent.db.get("databases",function(err,doc){
+		persistent.db.get("dataviews",function(err,doc){
 			if (err && err.error) {
-				persistent.db.put({databases:[]},"databases",function(err,response){
+				persistent.db.put({dataviews:[]},"dataviews",function(err,response){
 					that._rev=response.rev;
 				});
 			} else {
-				that.openDatabases(doc.databases,function(){
+				that.opendataviews(doc.dataviews,function(){
 					setTimeout(function(){
-						that.trigger(that.databases);
+						that.trigger(that.dataviews);
 					},100);
 				});
 				that._rev=doc._rev;
@@ -26,27 +26,31 @@ var store_database=Reflux.createStore({
 	}
 	,updateDb:function() {
 		var out=[];
-		for (var i=0;i<this.databases.length;i++) {
-			var d=this.databases[i];
-			out.push([d[1].dbname,d[2]]); //dbname, scrollto
+		for (var i=0;i<this.dataviews.length;i++) {
+			var d=this.dataviews[i];
+			out.push([d[1].dbname,d[2]]); //dbname, opts
 		}
-		persistent.db.put({databases:out}
-			,"databases"
-			,this._rev,function(err){
+		var that=this;
+		persistent.db.put({dataviews:out}
+			,"dataviews"
+			,this._rev,function(err,response){
 				if (err) {
 					console.log(err);
+				} else {
+					that._rev=response.rev;
 				}
+
 			});
 	}
 	,exists:function(db) {
-		for (var i=0;i<this.databases.length;i++) {
-			if (this.databases[i][1]===db) return i;
+		for (var i=0;i<this.dataviews.length;i++) {
+			if (this.dataviews[i][1]===db) return i;
 		} 
 		return -1;
 	}
 	,existsKey:function(key) {
-		for (var i=0;i<this.databases.length;i++) {
-			if (this.databases[i][0]===key) return i;
+		for (var i=0;i<this.dataviews.length;i++) {
+			if (this.dataviews[i][0]===key) return i;
 		}
 		return -1;		
 	}
@@ -58,41 +62,41 @@ var store_database=Reflux.createStore({
 		} while (this.existsKey(key)>-1) ;
 		return key;
 	}
-	,onClosedb:function(key) {
+	,onClose:function(key) {
 		var i=this.existsKey(key);
 		if (i>-1) {
-			this.databases.splice(i,1);
-			this.trigger(this.databases);
+			this.dataviews.splice(i,1);
+			this.trigger(this.dataviews);
 			this.updateDb();
 		}
 	}
-	,opendb:function(dbname,scrollto,insertAt,cb) {
+	,opendb:function(dbname,dbopts,insertAt,cb) {
 		kde.open(dbname,function(err,db){
 			if (!db) {
 				if (cb) cb.call(this,err);
 				return;
 			}
-			scrollto=scrollto||0;
+			dbopts=dbopts||{};
 			var key=db.dbname+".0";
 			if (typeof insertAt=="undefined") { //open freely
 				var at=this.exists(db);
 				if (at>-1) {
-					key=this.databases[at][0];
-					this.databases.splice(at,1); //remove opened
+					key=this.dataviews[at][0];
+					this.dataviews.splice(at,1); //remove opened
 				}
-				this.databases.unshift([key,db,scrollto]);
+				this.dataviews.unshift([key,db,dbopts]);
 			} else { //user specified an insert point
 				key=this.getNewKey(dbname);
-				this.databases.splice(insertAt,0,[key,db,scrollto]);
+				this.dataviews.splice(insertAt,0,[key,db,dbopts]);
 			}
 			if (cb) cb.call(this);
 		},this);
 	}
-	,openDatabases:function(entries,cb) {
+	,opendataviews:function(entries,cb) {
 		var that=this,opened=0;
 		for (var i=0;i<entries.length;i++) {
 			(function(item,idx){
-				that.opendb(entries[idx][0],entries[idx][1],-1,function(err){
+				that.opendb(entries[idx][0],entries[idx][1],idx,function(err){
 					opened++;
 					if (opened==entries.length) {
 						if (cb) cb.call(this);
@@ -101,12 +105,12 @@ var store_database=Reflux.createStore({
 			}(entries[i],i));
 		}
 	}
-	,onOpendb:function(dbname,scrollto,insertAt) {
+	,onOpen:function(dbname,scrollto,insertAt) {
 		this.opendb(dbname,scrollto,insertAt,function(){
-			this.trigger(this.databases);
+			this.trigger(this.dataviews);
 			this.updateDb();			
 		});
 	}
 });
 
-module.exports=store_database;
+module.exports=store_dataview;

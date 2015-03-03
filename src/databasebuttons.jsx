@@ -1,14 +1,14 @@
 /*
-	create a set of buttons , order described by ksana.js databases
+	create a set of buttons , order described by ksana.js dataviews
 */
 var React=require("react");
 var kde=require("ksana-database");
-var actions=require("./action_database");
+var actions=require("./action_dataview");
 var DatabaseButtons=React.createClass({
 	getInitialState:function() {
 		return {databases:[]}
 	}
-	,sortDatabase:function(databases){
+	,sortDataview:function(databases){
 		var out=[];
 		databases=databases.map(function(db){
 			if (db.indexOf(".kdb")>-1) db=db.substring(0,db.length-4);	
@@ -25,13 +25,13 @@ var DatabaseButtons=React.createClass({
 	}
 	,componentDidMount:function() {
 		kde.enumKdb(function(databases){
-			this.setState({databases:this.sortDatabase(databases)});
+			this.setState({databases:this.sortDataview(databases)});
 		},this);
 	}
 	,opendb:function(e) {
 		var insertAt;
 		if (e.ctrlKey) insertAt=0;
-		actions.opendb(e.target.name, 0, insertAt );
+		actions.open(e.target.name, 0, insertAt );
 	}
 	,renderItem:function(item,idx) {
 		return <button className="btn btn-primary" 
