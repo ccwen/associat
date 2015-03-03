@@ -3,7 +3,7 @@
 */
 var React=require("react");
 var kde=require("ksana-database");
-var actions=require("./action_dataview");
+var actions=require("./actions/dataview");
 var DatabaseButtons=React.createClass({
 	getInitialState:function() {
 		return {databases:[]}

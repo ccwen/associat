@@ -1,6 +1,6 @@
 var React=require("react");
 var MiddleControl=require("./middlecontrol.jsx");
-var Syntags=require("./syntags.jsx");
+var Syntags=require("./syntag/syntags.jsx");
 
 var MiddlePanel=React.createClass({
 	componentDidMount:function() {

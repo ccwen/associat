@@ -13,6 +13,7 @@
 div[contenteditable=true] > div {
   padding: 0;
 }
-
+div[contenteditable]:focus {outline:0px solid transparent};
 .scrollsyntag {height:400px;overflow-y:auto;}
 .droppable {background-color:yellow;}
+

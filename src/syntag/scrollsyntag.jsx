@@ -1,15 +1,17 @@
 var React=require("react");
-var kse=require("ksana-search");
-var ScrollPagination = require("./scrollpagination").ScrollPagination;
-var Page = require("./scrollpagination").ScrollPaginationPage;
-var store_syntag=require("./store_syntag");
-var Relation=require("./embedded_relation.jsx");
-
 var Reflux=require("reflux");
+
+var kse=require("ksana-search");
+var ScrollPagination = require("../scrollpagination").ScrollPagination;
+var Page = require("../scrollpagination").ScrollPaginationPage;
+var store_syntag=require("../stores/syntag");
+
+var SyntagEditor=require("./syntageditor.jsx");
 var E=React.createElement;
+
+
 var ScrollSyntag=React.createClass({
 	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag")]
-	,allowkeys:["ArrowRight","ArrowLeft","ArrowUp","ArrowDown","PageUp","PageDown"]
 	,getInitialState:function() {
 		var pages=[];
 		var segcount=this.props.db.get("meta").segcount;
@@ -27,18 +29,6 @@ var ScrollSyntag=React.createClass({
 	,componentDidMount:function(){
 		this.loadNextPage();
 	}
-	,oncopy:function(e) {
-		console.log("copy");
-	}
-	,onkeydown:function(e) {
-		if (this.allowkeys.indexOf(e.key)>-1 || (e.ctrlKey && e.keyCode===67)) return;
-		e.preventDefault();
-	}
-	,ondrop:function(e) {
-		console.log("drop");
-		e.preventDefault();
-	}
-	
 
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)
@@ -119,24 +109,23 @@ var ScrollSyntag=React.createClass({
 		this.setState({	hasNextPage: this.hasNextPage(),	hasPrevPage: this.hasPrevPage()});
 	}
 	,render: function () {
-		return React.createElement(ScrollPagination, {
+		return E(ScrollPagination, {
 			ref: "scrollPagination",
 			loadNextPage: this.loadNextPage,
 			loadPrevPage: this.loadPrevPage,
 			unloadPage: this.unloadPage,
 			hasNextPage: this.hasNextPage,
 			hasPrevPage: this.hasPrevPage,
-			onCopy:this.oncopy,
-			onDrop:this.ondrop,
-			onKeyDown:this.onkeydown,
+			component:SyntagEditor,
 			showCaret:true,
 		}, this.loadedPages.map(function (page, index) {
 			var spans=page.data.map(function (item,idx) {
-				return React.createElement('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
+				if (item[0]=="\n") return <br key={'i'+idx} /> ;
+				else return E('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
 			});
 
 			spans.unshift(<span key="pageid">{page.id}</span>);
-			return React.createElement(Page, { key: page.id, id:page.id,
+			return E(Page, { key: page.id, id:page.id,
 				onPageEvent: this.__handlePageEvent},spans	)
 		}.bind(this)));
 	}

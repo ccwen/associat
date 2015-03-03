@@ -1,5 +1,5 @@
 var Reflux=require("reflux");
-var actions=require("./action_syntag");
+var actions=require("../actions/syntag");
 var kde=require("ksana-database");
 var store_syntag=Reflux.createStore({
 	listenables:actions,

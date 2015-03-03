@@ -1,5 +1,5 @@
 var React=require("react");
-var action_dataview=require("./action_dataview");
+var action_dataview=require("../actions/dataview");
 var SyntagControl=React.createClass({
 	propTypes:{
 		db:React.PropTypes.object.isRequired

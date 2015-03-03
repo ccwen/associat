@@ -1,5 +1,5 @@
 var Reflux=require("reflux");
-var actions=require("./action_dataview");
+var actions=require("../actions/dataview");
 var kde=require("ksana-database");
 var persistent=require("./persistent");
 var store_dataview=Reflux.createStore({
