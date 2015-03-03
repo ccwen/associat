@@ -30,6 +30,7 @@ var ScrollPagination =  React.createClass({
 	}
 	,propTypes:{
 		component:React.PropTypes.func.isRequired
+		,wid:React.PropTypes.string.isRequired
 	}
 	,componentDidMount: function () {
 		var scrollParent = this.__scrollParent = findScrollParent(this.getDOMNode());
@@ -65,7 +66,9 @@ var ScrollPagination =  React.createClass({
 		return React.createElement(this.props.component, {
 			style: style,
 			ref: "wrapper",
-			children:this.props.children
+			wid:this.props.wid,
+			children:this.props.children,
+			selections:this.props.selections
 		});
 	},
 

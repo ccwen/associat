@@ -1,7 +1,9 @@
 var React=require("react");
+var SelectionStatus=require("./selectionstatus.jsx");
 var LeftTabs=React.createClass({
 	render:function(){
-		return <div>Lefttabs
+		return <div>
+			<SelectionStatus/>
 		</div>
 	}
 });

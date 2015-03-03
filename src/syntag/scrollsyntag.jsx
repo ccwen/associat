@@ -5,13 +5,19 @@ var kse=require("ksana-search");
 var ScrollPagination = require("../scrollpagination").ScrollPagination;
 var Page = require("../scrollpagination").ScrollPaginationPage;
 var store_syntag=require("../stores/syntag");
+var store_selection=require("../stores/selection");
 
-var SyntagEditor=require("./syntageditor.jsx");
+var SyntagEvents=require("./syntag_events.jsx");
 var E=React.createElement;
 
 
 var ScrollSyntag=React.createClass({
-	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag")]
+	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag"),
+			Reflux.listenTo(store_selection,"onStoreSelection")]
+	,propTypes:{
+		wid:React.PropTypes.string.isRequired
+		,db:React.PropTypes.object.isRequired
+	}
 	,getInitialState:function() {
 		var pages=[];
 		var segcount=this.props.db.get("meta").segcount;
@@ -23,7 +29,7 @@ var ScrollSyntag=React.createClass({
 			});
 		}
 		this.loadedPages=[];
-		return {pages:pages};
+		return {pages:pages,selections:[],highlights:[]};
 	}
 	,loadedPages:[]
 	,componentDidMount:function(){
@@ -80,7 +86,12 @@ var ScrollSyntag=React.createClass({
 		if (db!=this.props.db.dbname) return;
 		this.goToPage(seg);
 	}
-
+	,onStoreSelection:function(selections,wid) {
+		var sels=selections[wid];
+		if (wid!=this.props.wid || //not my business
+		  JSON.stringify(sels)==JSON.stringify(this.state.selections)) return ; //nothing to update	
+		this.setState({selections:sels});
+	}
 	,loadPrevPage : function () {
 		var pages=this.state.pages;
 		var firstLoadedPage = this.loadedPages[0];
@@ -108,6 +119,36 @@ var ScrollSyntag=React.createClass({
 		this.loadedPages = this.loadedPages.slice(0, index).concat(this.loadedPages.slice(index+1, this.loadedPages.length));
 		this.setState({	hasNextPage: this.hasNextPage(),	hasPrevPage: this.hasPrevPage()});
 	}
+	,inSelected:function(vpos) {
+		for (var i=0;i<this.state.selections.length;i++) {
+			var sel=this.state.selections[i];
+			if (vpos>=sel[0] && vpos<sel[0]+sel[1]) return true;
+		}
+		return false;
+	}
+	,highlighedStyle:function(idx) {
+		for (var i=0;i<this.state.highlights.length;i++) {
+			var hl=this.state.highlights[i];
+			if (idx>=hl[0] && idx<hl[0]+hl[1]) {
+				if (this.editing && this.editing[0]==hl[0] && this.editing[1]==hl[1]) {
+					return "editing";
+				} else {
+					return "highlighted";	
+				}
+			}
+		}
+		return "";
+	}
+	,renderChar:function(item,idx){
+		var vpos=item[1];
+		var text=item[0];
+		var cls="";
+		if (this.inSelected(vpos)) cls="selected";
+		cls+=this.highlighedStyle(vpos);
+
+		if (text=="\n") return <br key={'i'+idx} /> ;
+		return <span className={cls} key={"i"+idx} data-vpos={vpos}>{text}</span>
+	}
 	,render: function () {
 		return E(ScrollPagination, {
 			ref: "scrollPagination",
@@ -116,13 +157,12 @@ var ScrollSyntag=React.createClass({
 			unloadPage: this.unloadPage,
 			hasNextPage: this.hasNextPage,
 			hasPrevPage: this.hasPrevPage,
-			component:SyntagEditor,
+			component:SyntagEvents,
+			selections:this.state.selections,
+			wid:this.props.wid,
 			showCaret:true,
 		}, this.loadedPages.map(function (page, index) {
-			var spans=page.data.map(function (item,idx) {
-				if (item[0]=="\n") return <br key={'i'+idx} /> ;
-				else return E('span', { key:'i'+idx,"data-vpos":item[1] }, item[0]);	
-			});
+			var spans=page.data.map(this.renderChar);
 
 			spans.unshift(<span key="pageid">{page.id}</span>);
 			return E(Page, { key: page.id, id:page.id,

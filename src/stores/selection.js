@@ -7,7 +7,7 @@
 */
 
 var Reflux=require("reflux");
-var actions=require("./action_selection");
+var actions=require("../actions/selection");
 
 var store_selection=Reflux.createStore({
 	listenables: [actions]
@@ -26,8 +26,8 @@ var store_selection=Reflux.createStore({
 		}
 		return -1;
 	}
-	,onClearSelection:function(viewid) {
-		this.onSetSelection({},viewid);
+	,onClearSelection:function(wid) {
+		this.onSetSelection({},wid);
 	}
 	,onClearSelections:function() {
 		var keys=Object.keys(this.selections);
@@ -37,7 +37,7 @@ var store_selection=Reflux.createStore({
 		}
 		this.onSetSelections(cleared);
 	}
-	,onAddSelection:function(viewid,existingselections,start,len,append) {
+	,onAddSelection:function(wid,existingselections,start,len,append) {
 		var selections=JSON.parse(JSON.stringify(existingselections));
 		var oldselections=selections;
 		var same=this.hasSameSelection(selections,start,len);
@@ -61,19 +61,19 @@ var store_selection=Reflux.createStore({
 		}
 
 		if (updated) {
-			actions.setSelection(selections , viewid);
+			actions.setSelection(selections , wid);
 		}
 	}
-	,onSetSelection:function(selections,viewid) {
-		this.selections[viewid]=selections;
+	,onSetSelection:function(selections,wid) {
+		this.selections[wid]=selections;
 		actions.clearHighlights();
-		this.trigger(this.selections,viewid);
+		this.trigger(this.selections,wid);
 	}
-	,onSetSelections:function(viewselections) {
-		for (var i in viewselections) {
-			this.selections[i]=viewselections[i];
+	,onSetSelections:function(selections) {
+		for (var i in selections) {
+			this.selections[i]=selections[i];
 		}
-		var updated=Object.keys(viewselections);
+		var updated=Object.keys(selections);
 		for (var i=0;i<updated.length;i++){
 			this.trigger(this.selections,updated[i]); //notify affected view
 		}
@@ -82,8 +82,8 @@ var store_selection=Reflux.createStore({
 	,getSelections:function(){
 		return this.selections;
 	}
-	,getSelection:function(viewid){
-		return this.selections[viewid];
+	,getSelection:function(wid){
+		return this.selections[wid];
 	}
 });
 

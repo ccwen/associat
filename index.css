@@ -17,3 +17,6 @@ div[contenteditable]:focus {outline:0px solid transparent};
 .scrollsyntag {height:400px;overflow-y:auto;}
 .droppable {background-color:yellow;}
 
+span.selected {background:highlight}
+span.highlighted {background:#FFFFC2}
+span.editing {background:yellow}

@@ -1,9 +1,11 @@
 var React=require("react");
 var E=React.createElement;
-var SyntagEditor=React.createClass({
+
+var SyntagEvents=React.createClass({
 	propTypes:{
 		children:React.PropTypes.array.isRequired
 		,style:React.PropTypes.object.isRequired
+		,selections:React.PropTypes.object.isRequired
 	}
 	,mixins:[require("./clipboard_mixin"),require("./dragndrop_mixin"),
 			require("./mouse_mixin"),require("./keyboard_mixin")]
@@ -22,5 +24,5 @@ var SyntagEditor=React.createClass({
 		},this.props.children);
 	}
 });
-module.exports=SyntagEditor;
+module.exports=SyntagEvents;
 	

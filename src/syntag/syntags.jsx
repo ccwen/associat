@@ -27,7 +27,7 @@ var Syntags=React.createClass({
 		if (opts.query) comp=ExcerptView;
 		return E("div",{key:dbkey},
 				E(comp,{db:db,opts:opts,setting:setting,
-						dbkey:dbkey,height:this.suggestedHeight})
+						wid:dbkey,height:this.suggestedHeight})
 		);
 	}
 	,render:function(){
