@@ -35,7 +35,6 @@ var ScrollSyntag=React.createClass({
 	,componentDidMount:function(){
 		this.loadNextPage();
 	}
-
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)
 		this.refs.scrollPagination.handlePageEvent(pageId, event);
@@ -68,10 +67,10 @@ var ScrollSyntag=React.createClass({
 					this.setState({hasPrevPage: this.hasPrevPage()});
 				} else {
 					this.loadedPages.push(page);
-					this.setState({hasNextPage: this.hasNextPage()});					
+					this.setState({hasNextPage: this.hasNextPage()});
 				}
 			}.bind(this),1);
-		},this);		
+		},this);
 	}
 	,loadNextPage : function () {
 		var pages=this.state.pages;
@@ -89,7 +88,7 @@ var ScrollSyntag=React.createClass({
 	,onStoreSelection:function(selections,wid) {
 		var sels=selections[wid];
 		if (wid!=this.props.wid || //not my business
-		  JSON.stringify(sels)==JSON.stringify(this.state.selections)) return ; //nothing to update	
+		  JSON.stringify(sels)==JSON.stringify(this.state.selections)) return ; //nothing to update
 		this.setState({selections:sels});
 	}
 	,loadPrevPage : function () {
@@ -133,7 +132,7 @@ var ScrollSyntag=React.createClass({
 				if (this.editing && this.editing[0]==hl[0] && this.editing[1]==hl[1]) {
 					return "editing";
 				} else {
-					return "highlighted";	
+					return "highlighted";
 				}
 			}
 		}

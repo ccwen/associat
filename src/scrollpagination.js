@@ -135,7 +135,16 @@ var ScrollPagination =  React.createClass({
 			return scrollParent.scrollTop = scrollY;
 		}
 	},
-
+	firstVisiblePage:function() {
+		var scrolltop=this.getDOMNode().parentElement.scrollTop;
+		var children=this.getDOMNode().children;
+		for (var i=0;i<children.length;i++) {
+			if (children[i].offsetTop>scrolltop) {
+				return this.props.children[i];
+			}
+		}
+		return null;
+	},
 	__updatePageIds: function () {
 		var oldPageIds = this.__pageIds;
 		var unloadedPageIdsTop = [];
@@ -173,6 +182,7 @@ var ScrollPagination =  React.createClass({
 		}
 		this.__adjustScrollPosition(unloadedPageIdsTop, newPageIdsTop);
 		this.__pageIds = pageIds;
+
 	},
 
 	__adjustScrollPosition: function (unloadedPageIdsTop, newPageIdsTop) {
@@ -202,7 +212,7 @@ var ScrollPagination =  React.createClass({
 		var contentHeight = el.offsetHeight;
 
 		var offsetTop = 0;
-		
+
 		var ref = el;
 		while (ref) {
 			offsetTop += ref.offsetTop || 0;
