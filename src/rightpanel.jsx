@@ -6,7 +6,7 @@ var styles={
 var RightPanel=React.createClass({
 	render:function(){
 		return <div style={styles} >
-		RightPanel
+		RightPanelxxx xxqq
 		</div>
 	}
 });

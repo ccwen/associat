@@ -5,7 +5,7 @@ var SyntagEvents=React.createClass({
 	propTypes:{
 		children:React.PropTypes.array.isRequired
 		,style:React.PropTypes.object.isRequired
-		,selections:React.PropTypes.object.isRequired
+		,selections:React.PropTypes.array.isRequired
 	}
 	,mixins:[require("./clipboard_mixin"),require("./dragndrop_mixin"),
 			require("./mouse_mixin"),require("./keyboard_mixin")]

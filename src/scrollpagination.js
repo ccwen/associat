@@ -202,7 +202,7 @@ var ScrollPagination =  React.createClass({
 		var contentHeight = el.offsetHeight;
 
 		var offsetTop = 0;
-		/*  offsetTop must always be 0
+		
 		var ref = el;
 		while (ref) {
 			offsetTop += ref.offsetTop || 0;
@@ -211,7 +211,8 @@ var ScrollPagination =  React.createClass({
 				break;
 			}
 		}
-		*/
+
+		offsetTop=0; /*  offsetTop must always be 0 */
 		this.__dimentions = {
 			viewportHeight: viewportHeight,
 			contentHeight: contentHeight,
