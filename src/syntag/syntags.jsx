@@ -1,13 +1,14 @@
 var React=require("react");
 var Reflux=require("reflux");
-var store_database=require("../stores/dataview");
+var store_dataview=require("../stores/dataview");
+var action_dataview=require("../actions/dataview");
 var SyntagEdit=require("./syntagedit.jsx");
 var ExcerptView=require("./excerptview.jsx");
 var minHeight=200;
 var E=React.createElement;
 
 var Syntags=React.createClass({
-	mixins:[Reflux.listenTo(store_database,"onStoreDatabase")]
+	mixins:[Reflux.listenTo(store_dataview,"onStoreDatabase")]
 	,getInitialState:function() {
 		return {databases:[]};
 	}
@@ -18,6 +19,9 @@ var Syntags=React.createClass({
 		this.suggestedHeight=h;
 		this.setState({databases:databases});
 	}
+	,onFirstVisiblePageChanged:function(wid,segname) {
+		action_dataview.setFirstVisiblePage(wid,segname);
+	}
 	,renderItem:function(item,idx) {
 		var setting=ksana.js.databases[item[1].dbname];
 		var dbkey=item[0];
@@ -27,7 +31,9 @@ var Syntags=React.createClass({
 		if (opts.query) comp=ExcerptView;
 		return E("div",{key:dbkey},
 				E(comp,{db:db,opts:opts,setting:setting,
-						wid:dbkey,height:this.suggestedHeight})
+						wid:dbkey,height:this.suggestedHeight,
+						opts:opts,
+						onFirstVisiblePageChanged:this.onFirstVisiblePageChanged})
 		);
 	}
 	,render:function(){

@@ -6,7 +6,9 @@ var SyntagEdit=React.createClass({
 		db:React.PropTypes.object.isRequired
 		,wid:React.PropTypes.string.isRequired
 		,setting:React.PropTypes.object.isRequired
+		,opts:React.PropTypes.object.isRequired
 		,height:React.PropTypes.number
+		,onFirstVisiblePageChanged:React.PropTypes.func
 	}
 	,getDefaultProp:function(){
 		return {height:200};
@@ -17,8 +19,8 @@ var SyntagEdit=React.createClass({
 				<div style={{fontSize:"50%"}}>{this.props.setting.caption}<SyntagControl db={this.props.db} wid={this.props.wid} /></div>
 			</div>
 			<div ref="body" style={{overflowY:"auto",height:(this.props.height-41)+"px"}} className="panel-body">
-				<ScrollSyntag wid={this.props.wid} db={this.props.db}/>
-			</div>			
+				<ScrollSyntag wid={this.props.wid} db={this.props.db} opts={this.props.opts} onFirstVisiblePageChanged={this.props.onFirstVisiblePageChanged}/>
+			</div>
 		</div>
 	}
 });

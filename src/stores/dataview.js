@@ -24,6 +24,17 @@ var store_dataview=Reflux.createStore({
 			}
 		});
 	}
+	,onSetFirstVisiblePage:function(wid,pageid) {
+		for (var i=0;i<this.dataviews.length;i++){
+			dv=this.dataviews[i];
+			if (dv[0]===wid) {
+				if (dv[2].pageid!==pageid) {
+					dv[2].pageid=pageid;
+					this.updateDb();
+				}
+			}
+		}
+	}
 	,updateDb:function() {
 		var out=[];
 		for (var i=0;i<this.dataviews.length;i++) {
@@ -39,20 +50,19 @@ var store_dataview=Reflux.createStore({
 				} else {
 					that._rev=response.rev;
 				}
-
 			});
 	}
 	,exists:function(db) {
 		for (var i=0;i<this.dataviews.length;i++) {
 			if (this.dataviews[i][1]===db) return i;
-		} 
+		}
 		return -1;
 	}
 	,existsKey:function(key) {
 		for (var i=0;i<this.dataviews.length;i++) {
 			if (this.dataviews[i][0]===key) return i;
 		}
-		return -1;		
+		return -1;
 	}
 	,getNewKey:function(dbname) {
 		var i=Math.random().toString().substr(2,3);
@@ -85,7 +95,7 @@ var store_dataview=Reflux.createStore({
 					this.dataviews.splice(at,1); //remove opened
 				}
 				this.dataviews.unshift([key,db,dbopts]);
-			} else { //user specified an insert point				
+			} else { //user specified an insert point
 				this.dataviews.splice(insertAt,0,[key,db,dbopts]);
 			}
 			if (cb) cb.call(this);
@@ -107,7 +117,7 @@ var store_dataview=Reflux.createStore({
 	,onOpen:function(dbname,scrollto,insertAt) {
 		this.opendb(dbname,scrollto,insertAt,function(){
 			this.trigger(this.dataviews);
-			this.updateDb();			
+			this.updateDb();
 		});
 	}
 });

@@ -17,6 +17,7 @@ var ScrollSyntag=React.createClass({
 	,propTypes:{
 		wid:React.PropTypes.string.isRequired
 		,db:React.PropTypes.object.isRequired
+		,onFirstVisiblePageChanged:React.PropTypes.func
 	}
 	,getInitialState:function() {
 		var pages=[];
@@ -32,8 +33,24 @@ var ScrollSyntag=React.createClass({
 		return {pages:pages,selections:[],highlights:[]};
 	}
 	,loadedPages:[]
+
+	,getFirstVisiblePage:function() {
+		var first=this.refs.scrollPagination.firstVisiblePage();
+		var pg=this.loadedPages[first];
+		if (pg && this.pageid!==pg.id) {
+			this.props.onFirstVisiblePageChanged(this.props.wid,pg.id);
+			this.pageid=pg.id;
+		}
+	}
 	,componentDidMount:function(){
-		this.loadNextPage();
+		if (this.props.opts.pageid) {
+			this.goToPage(this.props.opts.pageid);
+		} else {
+			this.loadNextPage();
+		}
+		if (this.props.onFirstVisiblePageChanged) setInterval(function(){
+			this.getFirstVisiblePage();
+		}.bind(this),3000);
 	}
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)

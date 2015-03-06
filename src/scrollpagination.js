@@ -140,10 +140,10 @@ var ScrollPagination =  React.createClass({
 		var children=this.getDOMNode().children;
 		for (var i=0;i<children.length;i++) {
 			if (children[i].offsetTop>scrolltop) {
-				return this.props.children[i];
+				return i;
 			}
 		}
-		return null;
+		return children.length-1;
 	},
 	__updatePageIds: function () {
 		var oldPageIds = this.__pageIds;
