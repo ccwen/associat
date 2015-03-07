@@ -4,20 +4,20 @@ var Reflux=require("reflux");
 var kse=require("ksana-search");
 var ScrollPagination = require("../scrollpagination").ScrollPagination;
 var Page = require("../scrollpagination").ScrollPaginationPage;
-var store_syntag=require("../stores/syntag");
 var store_selection=require("../stores/selection");
-
+var store_relation=require("../stores/relation");
 var SyntagEvents=require("./syntag_events.jsx");
 var E=React.createElement;
 
 
 var ScrollSyntag=React.createClass({
-	mixins:[Reflux.listenTo(store_syntag,"onStoreSyntag"),
-			Reflux.listenTo(store_selection,"onStoreSelection")]
+	mixins:[Reflux.listenTo(store_relation,"onStoreRelation"),
+	Reflux.listenTo(store_selection,"onStoreSelection")]
 	,propTypes:{
 		wid:React.PropTypes.string.isRequired
 		,db:React.PropTypes.object.isRequired
 		,onFirstVisiblePageChanged:React.PropTypes.func
+		,onVisiblePageChanged:React.PropTypes.func
 	}
 	,getInitialState:function() {
 		var pages=[];
@@ -33,7 +33,9 @@ var ScrollSyntag=React.createClass({
 		return {pages:pages,selections:[],highlights:[]};
 	}
 	,loadedPages:[]
-
+	,onStoreRelation:function() {
+		//receive relation of loaded pages
+	}
 	,getFirstVisiblePage:function() {
 		var first=this.refs.scrollPagination.firstVisiblePage();
 		var pg=this.loadedPages[first];
@@ -42,15 +44,26 @@ var ScrollSyntag=React.createClass({
 			this.pageid=pg.id;
 		}
 	}
+	,componentDidUpdate:function() {
+		if (this.updatedtimer) clearTimeout(this.updatedtimer);
+		var that=this;
+		if (this.props.onVisiblePageChanged) {
+				this.updatedtimer=setTimeout(function(){
+					that.props.onVisiblePageChanged(that.props.wid,that.loadedPages[0].id,
+					that.loadedPages[that.loadedPages.length-1].id);
+			},300);
+		}
+	}
 	,componentDidMount:function(){
 		if (this.props.opts.pageid) {
 			this.goToPage(this.props.opts.pageid);
 		} else {
 			this.loadNextPage();
 		}
+		var that=this;
 		if (this.props.onFirstVisiblePageChanged) setInterval(function(){
-			this.getFirstVisiblePage();
-		}.bind(this),3000);
+			that.getFirstVisiblePage();
+		},3000);
 	}
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)

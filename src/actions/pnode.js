@@ -1,10 +1,8 @@
 /* operation on pnode */
 
 var actions=require("reflux").createActions([
-	"createPNode"       //create a PNode from current selection
-	,"deletePNode"
-	,"modifyPNode"
-	,"openPNode"
-	,"closePNode"
+	"create"       //create a PNode from current selection
+	,"open"
+	,"close"
 ]);
 module.exports=actions;

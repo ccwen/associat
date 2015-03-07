@@ -3,9 +3,9 @@
 
   visible pnode :
      1) pnode within text viewport
-     2) pinned or selected 
+     2) pinned or selected
 
-  //query 
+  //query
 */
 
 var Reflux=require("reflux");
@@ -14,14 +14,14 @@ var actions=require("./action_pnode");
 var store_pnode=Reflux.createStore({
 	listenables:actions,
 	pnodes:[]
-	,onOpenPNode:function(){
+	,onOpen:function(){
 
 	}
-	,onCreatePNode:function() {
+	,onCreate:function() {
 		this.pnodes.unshift({name:"noname"});
 		this.trigger(this.pnodes);
 	}
-	,onClosePNode:function(pnode) {
+	,onClose:function(pnode) {
 		var i=this.pnodes.indexOf(pnode);
 		if (i>-1) this.pnodes.splice(i,1);
 		this.trigger(this.pnodes);

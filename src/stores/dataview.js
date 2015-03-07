@@ -5,10 +5,19 @@ var persistent=require("./persistent");
 var store_dataview=Reflux.createStore({
 	listenables:actions,
 	dataviews:[]
-	,_rev:null
-
+//	,_rev:null
 	,init:function() {
 		var that=this;
+		var out=JSON.parse(localStorage.getItem("dataviews"))||[];
+		if (out.length){
+			this.opendataviews(out,function(){
+				setTimeout(function(){
+					that.trigger(that.dataviews);
+				},100);
+			});
+		}
+
+		/*
 		persistent.db.get("dataviews",function(err,doc){
 			if (err && err.error) {
 				persistent.db.put({dataviews:[]},"dataviews",function(err,response){
@@ -23,10 +32,20 @@ var store_dataview=Reflux.createStore({
 				that._rev=doc._rev;
 			}
 		});
+		*/
+	}
+	,getDB:function(wid) {
+		for (var i=0;i<this.dataviews.length;i++){
+			var dv=this.dataviews[i];
+			if (dv[0]===wid) {
+				return dv[1];
+			}
+		}
+		return null;
 	}
 	,onSetFirstVisiblePage:function(wid,pageid) {
 		for (var i=0;i<this.dataviews.length;i++){
-			dv=this.dataviews[i];
+			var dv=this.dataviews[i];
 			if (dv[0]===wid) {
 				if (dv[2].pageid!==pageid) {
 					dv[2].pageid=pageid;
@@ -42,6 +61,8 @@ var store_dataview=Reflux.createStore({
 			out.push([d[1].dbname,d[2]]); //dbname, opts
 		}
 		var that=this;
+		localStorage.setItem("dataviews",JSON.stringify(out));
+		/*
 		persistent.db.put({dataviews:out}
 			,"dataviews"
 			,this._rev,function(err,response){
@@ -51,6 +72,7 @@ var store_dataview=Reflux.createStore({
 					that._rev=response.rev;
 				}
 			});
+			*/
 	}
 	,exists:function(db) {
 		for (var i=0;i<this.dataviews.length;i++) {

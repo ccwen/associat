@@ -2,6 +2,7 @@ var React=require("react");
 var Reflux=require("reflux");
 var store_dataview=require("../stores/dataview");
 var action_dataview=require("../actions/dataview");
+
 var SyntagEdit=require("./syntagedit.jsx");
 var ExcerptView=require("./excerptview.jsx");
 var minHeight=200;
@@ -30,10 +31,10 @@ var Syntags=React.createClass({
 		var comp=SyntagEdit;
 		if (opts.query) comp=ExcerptView;
 		return E("div",{key:dbkey},
-				E(comp,{db:db,opts:opts,setting:setting,
-						wid:dbkey,height:this.suggestedHeight,
-						opts:opts,
-						onFirstVisiblePageChanged:this.onFirstVisiblePageChanged})
+				E(comp,{db:db,opts:opts,setting:setting
+						,wid:dbkey,height:this.suggestedHeight
+						,opts:opts
+						,onFirstVisiblePageChanged:this.onFirstVisiblePageChanged})
 		);
 	}
 	,render:function(){
