@@ -175,7 +175,7 @@ var ScrollSyntag=React.createClass({
 		var children=null;
 		if (ends.length) {
 			children=ends.map(function(markup,idx){
-				return E("span",{className:"markup",key:"i"+idx},markup[2].caption) 
+				return E("span",{className:"markup",key:"i"+idx},markup[2].caption)
 			});
 		}
 		if (!children) return null;

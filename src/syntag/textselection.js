@@ -2,8 +2,8 @@ var getRange=function() {
   var sel = getSelection();
   if (!sel.rangeCount) return;
   var range = sel.getRangeAt(0);
-  var s=range.startContainer.parentElement;
-  var e=range.endContainer.parentElement;
+  var s=range.startContainer.parentElement.parentElement;
+  var e=range.endContainer.parentElement.parentElement;
   if (s.nodeName!='SPAN' || e.nodeName!='SPAN') return;
   var start=parseInt(s.getAttribute('data-vpos'),10);
   var end=parseInt(e.getAttribute('data-vpos'),10);
@@ -17,13 +17,13 @@ var getselection=function() {
   var length=0;
   var sel = getSelection();
   if (!sel.rangeCount) return;
-  var range = sel.getRangeAt(0);    
-  var s=range.startContainer.parentElement;
-  var e=range.endContainer.parentElement;
+  var range = sel.getRangeAt(0);
+  var s=range.startContainer.parentElement.parentElement;
+  var e=range.endContainer.parentElement.parentElement;
   var n=e.nextSibling,nextstart=0;
-  if (!n) return null;           
+  if (!n) return null;
   if (n.nodeName=="SPAN") {
-    nextstart=parseInt(n.getAttribute('data-vpos'),10);  
+    nextstart=parseInt(n.getAttribute('data-vpos'),10);
   }
   var selectionlength=end-start+sel.extentOffset-sel.anchorOffset;
   if (start+selectionlength==nextstart) {//select till end of last token
