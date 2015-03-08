@@ -18,13 +18,18 @@ var relations={
 
 var store_relation=Reflux.createStore({
 	listenables:actions
-	,onSetVisiblePage:function(db,from,to) {
-		var off1=from*256;
-		var off2=to*256;
-		this.trigger({
-			off1: [ {caption:"pp"} ],
-			off2: [ {caption:"qq"} ]
-		});
+	,onSetVisibleRange:function(db,fromvpos,tovpos) {
+		var out=[],c=0;
+		var i=fromvpos;
+		while (i<tovpos){
+			var length=Math.floor(Math.random()*5)+1;
+			var offset=i*256;
+			out.push([offset, offset+length*256, {caption:"m"+c}] );
+			c++;
+			skip=Math.floor(Math.random()*100);
+			i+=skip;
+		}
+		this.trigger(db,out);
 	}
 })
 module.exports=store_relation;

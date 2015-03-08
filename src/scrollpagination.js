@@ -41,6 +41,7 @@ var ScrollPagination =  React.createClass({
 		this.__updateDimensions();
 		if (this.props.showCaret) {
 			this.getDOMNode().contentEditable=true;
+			this.getDOMNode().spellCheck=false;
 			this.getDOMNode().draggable=false;
 		}
 	}

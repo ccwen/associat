@@ -13,7 +13,13 @@ var SyntagEdit=React.createClass({
 	}
 	,onVisiblePageChanged:function(wid,from,to) {
 		if (wid!=this.props.wid) return;
-		action_relation.setVisiblePage(this.props.db,from,to);
+		if (from===this.from && to===this.to) return;
+		this.from=from;
+		this.to=to;
+		var segOffsets=this.props.db.get("segoffsets");
+		var fromvpos=segOffsets[from];
+		var tovpos=segOffsets[to];
+		action_relation.setVisibleRange(this.props.db,fromvpos,tovpos);
 	}
 	,getDefaultProp:function(){
 		return {height:200};

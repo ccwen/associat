@@ -20,3 +20,5 @@ div[contenteditable]:focus {outline:0px solid transparent};
 span.selected {background:highlight}
 span.highlighted {background:#FFFFC2}
 span.editing {background:yellow}
+
+span.markup {border-radius:50%;border-style:dotted;border-color:gray};

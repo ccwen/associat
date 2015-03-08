@@ -1,7 +1,7 @@
 action_relation=require("reflux").createActions([
 	"getRelations"
 	,"setRelations"
-	,"setVisiblePage"
+	,"setVisibleRange"
 ]);
 
 module.exports=action_relation;

@@ -7,6 +7,7 @@ var Page = require("../scrollpagination").ScrollPaginationPage;
 var store_selection=require("../stores/selection");
 var store_relation=require("../stores/relation");
 var SyntagEvents=require("./syntag_events.jsx");
+var relation_utils=require("../relation_utils");
 var E=React.createElement;
 
 
@@ -30,11 +31,12 @@ var ScrollSyntag=React.createClass({
 			});
 		}
 		this.loadedPages=[];
-		return {pages:pages,selections:[],highlights:[]};
+		return {pages:pages,selections:[],highlights:[],relations:[]};
 	}
 	,loadedPages:[]
-	,onStoreRelation:function() {
-		//receive relation of loaded pages
+	,onStoreRelation:function(db,data) {
+		if (db!==this.props.db) return;
+		this.setState({relations:data});
 	}
 	,getFirstVisiblePage:function() {
 		var first=this.refs.scrollPagination.firstVisiblePage();
@@ -168,15 +170,27 @@ var ScrollSyntag=React.createClass({
 		}
 		return "";
 	}
+	,renderMarkups:function(vpos){
+		var ends=relation_utils.endAt(this.state.relations,vpos);
+		var children=null;
+		if (ends.length) {
+			children=ends.map(function(markup,idx){
+				return E("span",{className:"markup",key:"i"+idx},markup[2].caption) 
+			});
+		}
+		if (!children) return null;
+		return <span>{children}</span>;
+	}
 	,renderChar:function(item,idx){
 		var vpos=item[1];
 		var text=item[0];
 		var cls="";
 		if (this.inSelected(vpos)) cls="selected";
 		cls+=this.highlighedStyle(vpos);
+		var children=this.renderMarkups(vpos);
 
 		if (text=="\n") return <br key={'i'+idx} /> ;
-		return <span className={cls} key={"i"+idx} data-vpos={vpos}>{text}</span>
+		return E("span",{className:cls,key:"i"+idx,"data-vpos":vpos},text,children);
 	}
 	,render: function () {
 		return E(ScrollPagination, {
