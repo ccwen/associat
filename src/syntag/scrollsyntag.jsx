@@ -5,14 +5,14 @@ var kse=require("ksana-search");
 var ScrollPagination = require("../scrollpagination").ScrollPagination;
 var Page = require("../scrollpagination").ScrollPaginationPage;
 var store_selection=require("../stores/selection");
-var store_relation=require("../stores/relation");
+var store_paradigm=require("../stores/paradigm");
 var SyntagEvents=require("./syntag_events.jsx");
 var relation_utils=require("../relation_utils");
 var E=React.createElement;
 
 
 var ScrollSyntag=React.createClass({
-	mixins:[Reflux.listenTo(store_relation,"onStoreRelation"),
+	mixins:[Reflux.listenTo(store_paradigm,"onStoreParadigm"),
 	Reflux.listenTo(store_selection,"onStoreSelection")]
 	,propTypes:{
 		wid:React.PropTypes.string.isRequired
@@ -31,12 +31,12 @@ var ScrollSyntag=React.createClass({
 			});
 		}
 		this.loadedPages=[];
-		return {pages:pages,selections:[],highlights:[],relations:[]};
+		return {pages:pages,selections:[],highlights:[],paradigm:[]};
 	}
 	,loadedPages:[]
-	,onStoreRelation:function(db,data) {
+	,onStoreParadigm:function(db,data) {
 		if (db!==this.props.db) return;
-		this.setState({relations:data});
+		this.setState({paradigm:data});
 	}
 	,getFirstVisiblePage:function() {
 		var first=this.refs.scrollPagination.firstVisiblePage();
@@ -171,11 +171,11 @@ var ScrollSyntag=React.createClass({
 		return "";
 	}
 	,renderMarkups:function(vpos){
-		var ends=relation_utils.endAt(this.state.relations,vpos);
+		var ends=relation_utils.endAt(this.state.paradigm,vpos);
 		var children=null;
 		if (ends.length) {
 			children=ends.map(function(markup,idx){
-				return E("span",{className:"markup",key:"i"+idx},markup[2].caption)
+				return E("span",{className:"markup",key:"i"+idx},markup[3].caption)
 			});
 		}
 		if (!children) return null;

@@ -3,7 +3,7 @@
 
   provide function to retrieve selected pcode
 
-  
+
 */
 
 var Reflux=require("reflux");
@@ -37,22 +37,22 @@ var store_selection=Reflux.createStore({
 		}
 		this.onSetSelections(cleared);
 	}
-	,onAddSelection:function(wid,existingselections,start,len,append) {
+	,onAddSelection:function(wid,existingselections,start,len,append,text) {
 		var selections=JSON.parse(JSON.stringify(existingselections));
 		var oldselections=selections;
 		var same=this.hasSameSelection(selections,start,len);
 		var updated=true;
 
-		if (same>-1) { //toggle 
+		if (same>-1) { //toggle
 			selections.splice(same,1);
 		} else {
 			oldlength=selections.length;
 			selections=this.removeOverlapSelection(selections,start,len);
 			if (append && len) {
-				selections.push([start,len]);
+				selections.push([start,len,text]);
 			} else {
 				if (len) {
-					selections=[[start,len]];
+					selections=[[start,len,text]];
 				} else {
 					if (selections.length) selections=[];
 					else updated=false;
@@ -61,7 +61,7 @@ var store_selection=Reflux.createStore({
 		}
 
 		if (updated) {
-			actions.setSelection(selections , wid);
+			this.onSetSelection(selections , wid);
 		}
 	}
 	,onSetSelection:function(selections,wid) {
@@ -72,7 +72,7 @@ var store_selection=Reflux.createStore({
 		//remove empty selection after updating views
 		if (selections.length==0) {
 			delete this.selections[wid];
-		}		
+		}
 	}
 	,onSetSelections:function(selections) {
 		for (var i in selections) {

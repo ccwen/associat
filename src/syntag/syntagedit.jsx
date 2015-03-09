@@ -1,7 +1,7 @@
 var React=require("react");
 var SyntagControl=require("./syntagcontrol.jsx");
 var ScrollSyntag=require("./scrollsyntag.jsx");
-var action_relation=require("../actions/relation");
+var action_paradigm=require("../actions/paradigm");
 var SyntagEdit=React.createClass({
 	propTypes:{
 		db:React.PropTypes.object.isRequired
@@ -19,7 +19,7 @@ var SyntagEdit=React.createClass({
 		var segOffsets=this.props.db.get("segoffsets");
 		var fromvpos=segOffsets[from];
 		var tovpos=segOffsets[to];
-		action_relation.setVisibleRange(this.props.db,fromvpos,tovpos);
+		action_paradigm.setVisibleRange(this.props.db,fromvpos,tovpos);
 	}
 	,getDefaultProp:function(){
 		return {height:200};

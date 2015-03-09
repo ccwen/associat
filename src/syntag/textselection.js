@@ -7,7 +7,14 @@ var getRange=function() {
   if (s.nodeName!='SPAN' || e.nodeName!='SPAN') return;
   var start=parseInt(s.getAttribute('data-vpos'),10);
   var end=parseInt(e.getAttribute('data-vpos'),10);
-  return [start,end];
+  var text="";
+  var n=s;
+  while (n) {
+    text+=n.innerText;
+    if (n==e) break;
+    n=n.nextSibling;
+  }
+  return [start,end,text];
 }
 var getselection=function() {
   var R=getRange();
@@ -21,6 +28,7 @@ var getselection=function() {
   var s=range.startContainer.parentElement.parentElement;
   var e=range.endContainer.parentElement.parentElement;
   var n=e.nextSibling,nextstart=0;
+  var text=R[2];
   if (!n) return null;
   if (n.nodeName=="SPAN") {
     nextstart=parseInt(n.getAttribute('data-vpos'),10);
@@ -39,7 +47,7 @@ var getselection=function() {
 
   //sel.empty();
  //this.refs.surface.getDOMNode().focus();
-  return {start:start,len:length};
+  return {start:start,len:length,text:text};
 }
 
 module.exports=getselection;

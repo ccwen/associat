@@ -3,12 +3,12 @@ var action_selection=require("../actions/selection");
 var mouse_mixin={
 
 	onmouseup:function(e){
-      var sel=textselection();  
+      var sel=textselection();
       var selections=this.props.selections;
       var oldlength=selections.length;
       if (!sel)return;
 
-      action_selection.addSelection(this.props.wid, selections, sel.start,sel.len , e.ctrlKey );
+      action_selection.addSelection(this.props.wid, selections, sel.start,sel.len , e.ctrlKey , sel.text);
 	}
 	,onmousedown:function(e) {
 		console.log("mousedown")

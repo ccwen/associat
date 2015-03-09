@@ -1,7 +1,8 @@
-action_relation=require("reflux").createActions([
+var action_paradigm=require("reflux").createActions([
 	"getRelations"
 	,"setRelations"
 	,"setVisibleRange"
+	,"newParadigm"
 ]);
 
-module.exports=action_relation;
+module.exports=action_paradigm;
