@@ -10,8 +10,8 @@ var PNodes = React.createClass({
   ,onStorePNode:function(data) {
     this.setState({pnodes:data});
   }
-  ,renderItem:function(item) {
-    return <PNodes data={item}/>
+  ,renderItem:function(item,idx) {
+    return <PNodeEdit key={idx} pcode={item[0]} dbid={item[2]} pnode={item[1]}/>
   }
   ,render: function() {
     return (

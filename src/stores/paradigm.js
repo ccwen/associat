@@ -5,6 +5,7 @@
 
 var Reflux=require("reflux");
 var actions=require("../actions/paradigm");
+var actions_pnode=require("../actions/pnode");
 var Paradigm=require("ksana-paradigm");
 var debug=false;
 var relations={
@@ -46,6 +47,7 @@ var store_paradigm=Reflux.createStore({
 		return wid.substr(0,i);
 	}
 	,parseSelection:function(wid_selections) {
+		// first key in wid_selections is master db, the rest are foreign
 		var wid=Object.keys(wid_selections);
 		if (wid.length==0) return null;
 		var res={ master:wid[0] , master_selections:null,foreign_selections:null };
@@ -62,14 +64,19 @@ var store_paradigm=Reflux.createStore({
 		res.master=this.wid2dbid(wid[0]);
 		return res;
 	}
+	,get:function(pcode,dbid) {
+		var pd=this.load(dbid);
+		if (!pd) return;
+		return pd.forward[pcode];
+	}
 	,onNewParadigm:function(wid_selections,payload) {
 		var res=this.parseSelection(wid_selections);
 		if (!res) return;
 		master=this.load(res.master);
 		for (var i in res.foreign_selections)	this.load(i);
-		var pnode=master.createBySelections(res.master_selections,res.foreign_selections,payload);
+		var pcode=master.createBySelections(res.master_selections,res.foreign_selections,payload);
 
-		console.log("pnode created",pnode);
+		actions_pnode.open(pcode,res.master);
 	}
 })
 module.exports=store_paradigm;

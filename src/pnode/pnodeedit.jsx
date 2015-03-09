@@ -11,7 +11,7 @@ var Relation=require("./embedded_relation.jsx");
 var E=React.createElement;
 var store_paradigm=require("../stores/paradigm");
 var RelationDropdown=require("./relation_dropdown.jsx");
-var editing_rel=[{caption:"editing r"}, 512, "b",512, "c", 516 ,"d", 145153,"x"];
+//var editing_rel=[{caption:"editing r"}, 512, "b",512, "c", 516 ,"d", 145153,"x"];
 //var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
 var dragobject=require("./drag");
 
@@ -33,24 +33,30 @@ var html2pcode=function(div,old) {
 }
 var PNodeEdit=React.createClass({
 	getInitialState:function() {
-		return {caretPos:0}
+		return {caretPos:0, pnode:JSON.parse(JSON.stringify(this.props.pnode))}
+	}
+	,propTypes:{
+		dbid:React.PropTypes.string.isRequired
+		,pcode:React.PropTypes.number.isRequired
+		,pnode:React.PropTypes.array.isRequired
 	}
 	,addSpan:function(n,at,text) {
-		var s=editing_rel[n];
+		var pnode=this.state.pnode;
+		var s=pnode[n];
 		var span=dragobject.start*256+dragobject.len;
 
 		//if (!this.state.relations[span]) this.state.relations[span]=[{caption:text}];
 
 		if (at==0) {
-			editing_rel.splice(n-1,0,span," ");
+			pnode.splice(n-1,0,span," ");
 		} else if (at==s.length-1) {
-			editing_rel.splice(n,0,span," ");
+			pnode.splice(n,0,span," ");
 		} else {
 			s2=s.substr(at);
-			editing_rel.splice(n+1,0,span," ",s2);
-			editing_rel[n]=s.substr(0,at);
+			pnode.splice(n+1,0,span," ",s2);
+			pnode[n]=s.substr(0,at);
 		}
-		this.forceUpdate();
+		this.setState({pnode:pnode});
 	}
 	,reldragend:function(e) {
 		e.target.classList.remove("dragging");
@@ -85,17 +91,19 @@ var PNodeEdit=React.createClass({
 
 	}
 	,componentDidMount:function() {
-		this.refs.body.getDOMNode().contentEditable="true";
+		this.refs.body.getDOMNode().contentEditable=true;
 		action_paradigm.getRelations();
+		this.refs.caption.getDOMNode().contentEditable=true;
 	}
 	,close:function() {
-		action_pnode.closePNode(this.props.data);
+		action_pnode.close(this.props.pcode);
 	}
 	,captionkeydown:function(e) {
 		if (e.key=="Enter") {
-			editing_rel[0].caption=e.target.innerText.substring(0,10);
+			var pnode=this.state.pnode;
+			pnode[0].caption=e.target.innerText.substring(0,10);
 			e.preventDefault();
-			this.forceUpdate();
+			this.setState({pnode:pnode});
 		}
 	}
 	,render:function(){
@@ -104,7 +112,7 @@ var PNodeEdit=React.createClass({
 			<div className="panel-heading">
 				<h3 className="panel-title" draggable="true"
 				 onDragEnd={this.reldragend} onDragStart={this.reldragstart} >
-				    <span onKeyDown={this.captionkeydown} contentEditable={true} title="dragable">{editing_rel[0].caption}</span>
+				    <span ref="caption" onKeyDown={this.captionkeydown} title="dragable">{this.state.pnode[0].caption}</span>
 					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
 				    <span className="pull-right"><RelationDropdown/></span>
 				</h3>
@@ -112,7 +120,7 @@ var PNodeEdit=React.createClass({
 			<div ref="body" onKeyDown={this.keydown} onKeyUp={this.keyup} onInput={this.oninput} onBlur={this.onblur}
 			 onPaste={this.onpaste} onCut={this.oncut} spellCheck={false}  onDrop={this.drop} onDragOver={this.allowdrop}
 			 className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
-			 <Relation rel={editing_rel} depth={0} caretPos={this.state.caretPos}/>
+			 <Relation dbid={this.props.dbid} pnode={this.state.pnode} depth={0} caretPos={this.state.caretPos}/>
 			 </div>
 		</div>
 	}

@@ -4,7 +4,6 @@ var Relation_text_editor=React.createClass({
 		"onFinish":React.PropTypes.func.isRequired
 		,"text":React.PropTypes.string.isRequired
 	}
-
 	,onkeypress:function(e) {
 		if (e.key=="Enter") {
 			this.finish(e);
@@ -24,7 +23,7 @@ var Relation_text_editor=React.createClass({
 	,render:function() {
 		var size=this.props.text.length;
 		if (size<4) size=4;
-		return <input contentEditable={true} onBlur={this.finish} size={size} onKeyDown={this.onkeydown} defaultValue={this.props.text} onKeyPress={this.onkeypress} />
+		return <input onBlur={this.finish} size={size} onKeyDown={this.onkeydown} defaultValue={this.props.text} onKeyPress={this.onkeypress} />
 	}
 });
 

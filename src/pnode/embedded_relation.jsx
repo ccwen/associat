@@ -2,9 +2,11 @@ var React=require("react");
 var Reflux=require("reflux");
 var textstyle={cursor:"auto"};
 var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
-var store_paradigm=require("../stores/paradigm");
+
 var action_syntag=require("../actions/syntag");
 var action_paradigm=require("../actions/paradigm");
+
+var store_paradigm=require("../stores/paradigm");
 var RelationTextEdit=require("./relation_textedit.jsx");
 var MAXVISIBLEDEPTH=4;
 var E=React.createElement;
@@ -21,35 +23,27 @@ var styleFromDepth=function(depth) {
 
 var Relation=React.createClass({
 	propTypes:{
-		rel:React.PropTypes.array.isRequired
+		pnode:React.PropTypes.array.isRequired
+		,dbid:React.PropTypes.string.isRequired
 		,depth:React.PropTypes.number.isRequired
 		,caretPos:React.PropTypes.number
 	}
-	,mixins:[Reflux.listenTo(store_paradigm,"onStoreParadigm")]
-	,onStoreParadigm:function(paradigms) {
-		this.setState({paradigms:paradigms})
-	}
-	,componentDidMount:function() {
-		if (Object.keys(this.state.paradigm).length==0) {
-			action_paradigm.getRelations(); //only top level relation will fetch relations
-		}
-	}
 	,getInitialState:function() {
-		return {paradigms:this.props.paradigms||{}};
+		return {pnode:this.props.pnode,editing:-1};
 	}
 	,openRel:function(e) {
 		this.props.rel[e.target.parentNode.dataset.n]=-this.props.rel[e.target.parentNode.dataset.n];
 		e.stopPropagation();
 		this.forceUpdate();
 	}
-	,renderRel:function(rel,opened,pcode,idx) {
+	,renderPNode:function(pnode,opened,pcode,idx) {
 		var children=null,extra=null;
 		var rcaption=rel[0].caption;
 		var draggable=this.props.depth==0;
 		if (opened){
 			extra=" ",
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
-			children=E(Relation,{depth:this.props.depth+1, rel:rel, paradigms:this.state.paradigms} );
+			children=E(Relation,{depth:this.props.depth+1, pnode:pnode} );
 		} else {
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px blue"};
 
@@ -82,8 +76,9 @@ var Relation=React.createClass({
 		this.setState({editing:parseInt(e.target.dataset.n)});
 	}
 	,doneedit:function(text) {
-		this.props.rel[this.state.editing]=text;
-		this.setState({editing:-1});
+		var pnode=this.state.pnode;
+		pnode[this.state.editing]=text;
+		this.setState({pnode:pnode,editing:-1});
 	}
 	,renderItem:function(item,idx) {
 		if (idx==0) return;
@@ -98,18 +93,18 @@ var Relation=React.createClass({
 		} else if (typeof item==="number") {
 			var opened=false;
 			if (item<0) opened=true;
-			var rel=this.state.paradigms[Math.abs(item)];
+			var pnode=store_paradigm.get( item , this.props.dbid);
 			var extra=null,children=null;
 			var expander=null;
 			var draggable=this.props.depth==0;
-			if (rel) {
+			if (pnode) {
 				if (Math.abs(item)%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
-					return this.renderRel(rel,opened,item,idx);
+					return this.renderPNode(pnode,opened,item,idx);
 				} else {
-					//final node, a span or a rel depth > MAXVISIBLEDEPTH
+					//final node, a span or a pnode depth > MAXVISIBLEDEPTH
 
 					return E("span",{"data-pcode":item,"data-n":idx,style:spanbtnstyle,
-						key:"k"+idx,onClick:this.openpnode, draggable:draggable,contentEditable:false,readOnly:true},rel[0].caption);
+						key:"k"+idx,onClick:this.openpnode, draggable:draggable,contentEditable:false,readOnly:true},pnode[0].caption);
 				}
 			} else {
 				return E("span",{key:"k"+idx,"data-pcode":item, draggable:draggable,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},Math.abs(item));
@@ -118,7 +113,7 @@ var Relation=React.createClass({
 	}
 	,render:function(){
 		return <span style={styleFromDepth(this.props.depth)}>
-		{this.props.rel.map(this.renderItem)}
+		{this.props.pnode.map(this.renderItem)}
 		</span>
 	}
 
