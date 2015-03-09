@@ -22,9 +22,12 @@ var store_paradigm=Reflux.createStore({
 	listenables:actions
 	,barrels:{}
 	,load:function(db) {
-		var relations=localStorage.getItem(db.dbname+"_relations")||"";
-		this.barrels[db.dbname]=Paradigm.barrel.loadFromString(db.dbname,relations);
+		if (!this.barrels[db]){
+			var relations=localStorage.getItem(db.dbname+"_relations")||"";
+			this.barrels[db.dbname]=Paradigm.barrel.loadFromString(db.dbname,relations);
+		}
 		if (debug) console.log("load markup of db",db.dbname,this.barrels[db.dbname]);
+		return this.barrels[db.dbname];
 	}
 	,save:function(db) {
 		localStorage.setItem(db.dbname, this.barrels[db.dbname].saveToString() );
@@ -32,34 +35,53 @@ var store_paradigm=Reflux.createStore({
 	,saveAll:function() {
 		for (var i in this.barrels) this.save(i);
 	}
-	,onMarkupChanged:function(db,relations) {
-		if (this.db && db===this.db) {
-			this.relations=relations;
-			this.onSetVisibleRange(this.db,this.fromvpos,this.tovpos);
-		}
-	}
 	,onSetVisibleRange:function(db,fromvpos,tovpos) {
 		if (debug) console.log("setvisible range of ",db.dbname)
-		var out=[],c=0;
-		var i=fromvpos;
-		while (i<tovpos){
-			var length=Math.floor(Math.random()*5)+1;
-			var offset=i*256;
-			out.push([offset, offset+length*256, offset, {caption:"m"+c}  ] );
-			c++;
-			skip=Math.floor(Math.random()*100);
-			i+=skip;
-		}
-		this.db=db;
-		this.fromvpos=fromvpos;
-		this.tovpos=tovpos;
+		var out=[]; //  each item: [start_offset,end_offset, pcode, data ....]
+
 		this.trigger(db,out);
 	}
+	,wid2dbid:function(wid) {
+		var i=wid.lastIndexOf("_");
+		return wid.substr(0,i);
+	}
+	,parseSelection:function(wid_selections) {
+		var wid=Object.keys(wid_selections);
+		if (wid.length==0) return null;
+		var res={ master:wid[0] , master_selections:null,foreign_selections:null };
+
+		for (var i in wid_selections) {
+			if (i==res.master) {
+				res.master_selections=wid_selections[i];
+			} else {
+				if (!res.foreign_selections) res.foreign_selections={};
+				var foreign_db=this.wid2dbid(i);
+				res.foreign_selections[foreign_db]=wid_selections[i];
+			}
+		}
+		res.master=this.wid2dbid(wid[0]);
+		return res;
+	}
 	,onNewParadigm:function(wid_selections,payload) {
-		//create span with caption for all selections
-		//create a new relation consists of all selections
-		//open pnodeedit for the newly created relation
-		console.log(wid_selections);
+		var res=this.parseSelection(wid_selections);
+		if (!res) return;
+		master=this.load(res.master);
+		for (var i in res.foreign_selections)	this.load(i);
+		var pnode=master.createBySelections(res.master_selections,res.foreign_selections,payload);
+
+		console.log("pnode created",pnode);
 	}
 })
 module.exports=store_paradigm;
+
+/*
+var i=fromvpos;
+while (i<tovpos){
+	var length=Math.floor(Math.random()*5)+1;
+	var offset=i*256;
+	out.push([offset, offset+length*256, offset, {caption:"m"+c}  ] );
+	c++;
+	skip=Math.floor(Math.random()*100);
+	i+=skip;
+}
+*/
