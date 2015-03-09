@@ -3,7 +3,7 @@ var actions=require("../actions/dataview");
 var kde=require("ksana-database");
 var kse=require("ksana-search");
 var persistent=require("./persistent");
-var store_relation=require("./relation");
+var store_paradigm=require("../stores/paradigm");
 var store_dataview=Reflux.createStore({
 	listenables:actions,
 	dataviews:[]
@@ -122,7 +122,7 @@ var store_dataview=Reflux.createStore({
 			} else { //user specified an insert point
 				this.dataviews.splice(insertAt,0,[key,db,dbopts]);
 			}
-			store_relation.load(db);
+			store_paradigm.load(db.dbname);
 			if (cb) cb.call(this);
 		},this);
 	}

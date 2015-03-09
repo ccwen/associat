@@ -9,7 +9,7 @@
 */
 
 var Reflux=require("reflux");
-var actions=require("./action_pnode");
+var actions=require("../actions/pnode");
 
 var store_pnode=Reflux.createStore({
 	listenables:actions,

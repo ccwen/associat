@@ -21,16 +21,16 @@ var relations={
 var store_paradigm=Reflux.createStore({
 	listenables:actions
 	,barrels:{}
-	,load:function(db) {
-		if (!this.barrels[db]){
-			var relations=localStorage.getItem(db.dbname+"_relations")||"";
-			this.barrels[db.dbname]=Paradigm.barrel.loadFromString(db.dbname,relations);
+	,load:function(dbname) {
+		if (!this.barrels[dbname]){
+			var relations=localStorage.getItem(dbname+"_relations")||"";
+			this.barrels[dbname]=Paradigm.barrel.loadFromString(dbname,relations);
 		}
-		if (debug) console.log("load markup of db",db.dbname,this.barrels[db.dbname]);
-		return this.barrels[db.dbname];
+		if (debug) console.log("load markup of db",dbname,this.barrels[dbname]);
+		return this.barrels[dbname];
 	}
-	,save:function(db) {
-		localStorage.setItem(db.dbname, this.barrels[db.dbname].saveToString() );
+	,save:function(dbname) {
+		localStorage.setItem(dbname, this.barrels[dbname].saveToString() );
 	}
 	,saveAll:function() {
 		for (var i in this.barrels) this.save(i);

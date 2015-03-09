@@ -2,9 +2,9 @@ var React=require("react");
 var Reflux=require("reflux");
 var textstyle={cursor:"auto"};
 var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
-var store_relation=require("../stores/relation");
+var store_paradigm=require("../stores/paradigm");
 var action_syntag=require("../actions/syntag");
-var action_relation=require("../actions/relation");
+var action_paradigm=require("../actions/paradigm");
 var RelationTextEdit=require("./relation_textedit.jsx");
 var MAXVISIBLEDEPTH=4;
 var E=React.createElement;
@@ -23,19 +23,19 @@ var Relation=React.createClass({
 	propTypes:{
 		rel:React.PropTypes.array.isRequired
 		,depth:React.PropTypes.number.isRequired
-		,caretPos:React.PropTypes.number		
+		,caretPos:React.PropTypes.number
 	}
-	,mixins:[Reflux.listenTo(store_relation,"onStoreRelation")]
-	,onStoreRelation:function(relations) {
-		this.setState({relations:relations})
+	,mixins:[Reflux.listenTo(store_paradigm,"onStoreParadigm")]
+	,onStoreParadigm:function(paradigms) {
+		this.setState({paradigms:paradigms})
 	}
 	,componentDidMount:function() {
-		if (Object.keys(this.state.relations).length==0) {
-			action_relation.getRelations(); //only top level relation will fetch relations
+		if (Object.keys(this.state.paradigm).length==0) {
+			action_paradigm.getRelations(); //only top level relation will fetch relations
 		}
 	}
 	,getInitialState:function() {
-		return {relations:this.props.relations||{}};
+		return {paradigms:this.props.paradigms||{}};
 	}
 	,openRel:function(e) {
 		this.props.rel[e.target.parentNode.dataset.n]=-this.props.rel[e.target.parentNode.dataset.n];
@@ -49,7 +49,7 @@ var Relation=React.createClass({
 		if (opened){
 			extra=" ",
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
-			children=E(Relation,{depth:this.props.depth+1, rel:rel, relations:this.state.relations} );
+			children=E(Relation,{depth:this.props.depth+1, rel:rel, paradigms:this.state.paradigms} );
 		} else {
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px blue"};
 
@@ -87,18 +87,18 @@ var Relation=React.createClass({
 	}
 	,renderItem:function(item,idx) {
 		if (idx==0) return;
-//dangerouslySetInnerHTML={{__html:item}}/>	
+//dangerouslySetInnerHTML={{__html:item}}/>
 		if (typeof item=="string") {
 			item=item.replace(/\n/g,"<br/>");
 			if (this.state.editing==idx && this.props.depth==0) {
 				return <RelationTextEdit key={"k"+idx} text={item} onFinish={this.doneedit}/>
 			} else {
-				return <span onClick={this.edittext} key={"k"+idx} data-n={idx} style={textstyle} >{item}</span>	
+				return <span onClick={this.edittext} key={"k"+idx} data-n={idx} style={textstyle} >{item}</span>
 			}
 		} else if (typeof item==="number") {
 			var opened=false;
 			if (item<0) opened=true;
-			var rel=this.state.relations[Math.abs(item)];
+			var rel=this.state.paradigms[Math.abs(item)];
 			var extra=null,children=null;
 			var expander=null;
 			var draggable=this.props.depth==0;
@@ -121,7 +121,7 @@ var Relation=React.createClass({
 		{this.props.rel.map(this.renderItem)}
 		</span>
 	}
-	
+
 });
 
 module.exports=Relation;
