@@ -18,6 +18,30 @@ var relations={
 	,512: [{caption:"R1"} ,"b1", 256 , "b2",256]
 };
 
+var createBySelections=function(selections,foreign_selections,payload,opts) {
+	var args=[];
+	opts=opts||{};
+	args.push(payload||{caption:opts.caption|| "*"+(this.relationCount+1)});
+
+	for (var i=0;i<selections.length;i++) {
+		var sel=selections[i];
+		this.setSpanCaption(sel[0],sel[1],sel[2]);
+		args.push( this.pcodeFromSpan(sel[0],sel[1]) )
+		args.push(sel[3]||opts.desc||"…"); //place holder for description
+	}
+
+	for (var j in foreign_selections) {
+		var ext=this.getExternal(j);
+		var sels=foreign_selections[j];
+		for (var k=0;k<sels.length;k++) {
+			var sel=sels[k];
+			ext.setSpanCaption(sel[0],sel[1],sel[2]);
+			args.push( this.pcodeFromSpan(sel[0],sel[1],j) );
+			args.push(sel[3]||opts.desc||"…"); //place holder for description
+		}
+	}
+	return this.addRel.apply(this,args);
+}
 
 var store_paradigm=Reflux.createStore({
 	listenables:actions
@@ -79,8 +103,7 @@ var store_paradigm=Reflux.createStore({
 		if (!res) return;
 		master=this.load(res.master);
 		for (var i in res.foreign_selections)	this.load(i);
-		var pcode=master.createBySelections(res.master_selections,res.foreign_selections,payload);
-
+		var pcode=createBySelections.call(master,res.master_selections,res.foreign_selections,payload);
 		actions_pnode.open(pcode,res.master);
 	}
 })
