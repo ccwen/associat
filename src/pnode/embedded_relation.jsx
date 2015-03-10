@@ -36,14 +36,14 @@ var Relation=React.createClass({
 		e.stopPropagation();
 		this.forceUpdate();
 	}
-	,renderPNode:function(pnode,opened,pcode,idx) {
+	,renderPNode:function(dbid,pnode,opened,pcode,idx) {
 		var children=null,extra=null;
 		var rcaption=rel[0].caption;
 		var draggable=this.props.depth==0;
 		if (opened){
 			extra=" ",
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
-			children=E(Relation,{depth:this.props.depth+1, pnode:pnode} );
+			children=E(Relation,{depth:this.props.depth+1, pnode:pnode,dbid:dbid} );
 		} else {
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px blue"};
 
@@ -90,16 +90,23 @@ var Relation=React.createClass({
 			} else {
 				return <span onClick={this.edittext} key={"k"+idx} data-n={idx} style={textstyle} >{item}</span>
 			}
-		} else if (typeof item==="number") {
+		} else {
 			var opened=false;
-			if (item<0) opened=true;
-			var pnode=store_paradigm.get( item , this.props.dbid);
+			var pcode=item;
+			var dbid=this.props.dbid;
+			if (item[1]) {
+				pcode=item[0];
+				dbid=store_paradigm.getDBName(this.props.dbid,item[1]);
+			}
+
+			if (pcode<0) opened=true;
+			var pnode=store_paradigm.get( pcode , dbid);
 			var extra=null,children=null;
 			var expander=null;
 			var draggable=this.props.depth==0;
 			if (pnode) {
 				if (Math.abs(item)%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
-					return this.renderPNode(pnode,opened,item,idx);
+					return this.renderPNode(dbid,pnode,opened,pcode,idx);
 				} else {
 					//final node, a span or a pnode depth > MAXVISIBLEDEPTH
 

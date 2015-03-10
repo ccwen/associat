@@ -67,7 +67,12 @@ var store_paradigm=Reflux.createStore({
 	,get:function(pcode,dbid) {
 		var pd=this.load(dbid);
 		if (!pd) return;
-		return pd.forward[pcode];
+		return pd.getPayload(pcode);
+	}
+	,getDBName:function(dbid,externalid) {
+		var pd=this.load(dbid);
+		if (!pd) return;
+		return pd.getDBName(externalid);
 	}
 	,onNewParadigm:function(wid_selections,payload) {
 		var res=this.parseSelection(wid_selections);
