@@ -19,7 +19,7 @@ var SyntagEdit=React.createClass({
 		var segOffsets=this.props.db.get("segoffsets");
 		var fromvpos=segOffsets[from];
 		var tovpos=segOffsets[to];
-		action_paradigm.setVisibleRange(this.props.db,fromvpos,tovpos);
+		action_paradigm.setVisibleRange(this.props.db.dbname,fromvpos,tovpos);
 	}
 	,getDefaultProp:function(){
 		return {height:200};

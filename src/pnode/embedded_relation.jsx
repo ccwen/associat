@@ -25,8 +25,11 @@ var Relation=React.createClass({
 	propTypes:{
 		pnode:React.PropTypes.array.isRequired
 		,dbid:React.PropTypes.string.isRequired
-		,depth:React.PropTypes.number.isRequired
+		,depth:React.PropTypes.number
 		,caretPos:React.PropTypes.number
+	}
+	,getDefaultProps:function(){
+		return {caretPos:0,depth:0}
 	}
 	,getInitialState:function() {
 		return {pnode:this.props.pnode,editing:-1};

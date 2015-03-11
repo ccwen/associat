@@ -1,13 +1,11 @@
 var endAt=function(relations,vpos) {
-  var end=vpos*256;
   return relations.filter(function(item){
-    return (item[1]===end)
+    return (item[1]===vpos)
   });
 }
 var startAt=function(relations,vpos) {
-  var start=vpos*256;
   return relations.filter(function(item){
-    return (item[0]===start)
+    return (item[0]===vpos)
   });
 }
 

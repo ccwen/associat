@@ -101,8 +101,8 @@ var store_selection=Reflux.createStore({
 		actions.clearHighlights();
 
 		for (var i in this.selections) {
-			if (this.selections[wid].length===0) {
-				delete this.selections[wid];
+			if (this.selections[i].length===0) {
+				delete this.selections[i];
 			}
 		}
 	}

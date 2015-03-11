@@ -47,6 +47,7 @@ var createBySelections=function(selections,foreign_selections,payload,opts) {
 var store_paradigm=Reflux.createStore({
 	listenables:actions
 	,barrels:{}
+	,visibleRanges:{}
 	,load:function(dbname) {
 		if (!this.barrels[dbname]){
 			var relations=localStorage.getItem(dbname+"_relations")||"";
@@ -61,11 +62,16 @@ var store_paradigm=Reflux.createStore({
 	,saveAll:function() {
 		for (var i in this.barrels) this.save(i);
 	}
-	,onSetVisibleRange:function(db,fromvpos,tovpos) {
-		if (debug) console.log("setvisible range of ",db.dbname)
-		var out=[]; //  each item: [start_offset,end_offset, pcode, data ....]
+	,onSetVisibleRange:function(dbname,fromvpos,tovpos) {
+		if (debug)	console.log("setvisible range of ",dbname);
+		//  each item: [start_offset,end_offset, pcode, pnode]
 
-		this.trigger(db,out);
+		var pd=this.barrels[dbname];
+		if (!pd) return;
+		var out=pd.filterByVpos(fromvpos,tovpos);
+
+		this.visibleRanges[dbname]=[fromvpos,tovpos];
+		this.trigger(dbname,out);
 	}
 	,wid2dbid:function(wid) {
 		var i=wid.lastIndexOf("_");
@@ -111,6 +117,11 @@ var store_paradigm=Reflux.createStore({
 		actions_pnode.open(pcode,res.master);
 
 		actions_selection.clearSelections();
+		for (var dbname in this.visibleRanges) {
+			var r=this.visibleRanges[dbname];
+			this.onSetVisibleRange(dbname,r[0],r[1]);
+		}
+
 	}
 })
 module.exports=store_paradigm;

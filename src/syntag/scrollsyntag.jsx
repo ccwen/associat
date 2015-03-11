@@ -8,6 +8,7 @@ var store_selection=require("../stores/selection");
 var store_paradigm=require("../stores/paradigm");
 var SyntagEvents=require("./syntag_events.jsx");
 var relation_utils=require("../relation_utils");
+var Relation=require("../pnode/embedded_relation.jsx");
 var E=React.createElement;
 
 
@@ -34,8 +35,8 @@ var ScrollSyntag=React.createClass({
 		return {pages:pages,selections:[],highlights:[],paradigm:[]};
 	}
 	,loadedPages:[]
-	,onStoreParadigm:function(db,data) {
-		if (db!==this.props.db) return;
+	,onStoreParadigm:function(dbname,data) {
+		if (dbname!==this.props.db.dbname) return;
 		this.setState({paradigm:data});
 	}
 	,getFirstVisiblePage:function() {
@@ -175,8 +176,8 @@ var ScrollSyntag=React.createClass({
 		var children=null;
 		if (ends.length) {
 			children=ends.map(function(markup,idx){
-				return E("span",{className:"markup",key:"i"+idx},markup[3].caption)
-			});
+				return E(Relation,{key:"i"+idx,depth:1,dbid:this.props.db.dbname,pnode:[{},markup[2]]});
+			},this);
 		}
 		if (!children) return null;
 		return <span>{children}</span>;
