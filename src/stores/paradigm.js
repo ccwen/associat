@@ -6,17 +6,9 @@
 var Reflux=require("reflux");
 var actions=require("../actions/paradigm");
 var actions_pnode=require("../actions/pnode");
+var actions_selection=require("../actions/selection");
 var Paradigm=require("ksana-paradigm");
 var debug=false;
-var relations={
-	145153:[{caption:"18段"}]
-	,516:[{caption:"引用"}]
-	,1024:[{caption:"R4"},"aaa",517,"bb"]
-	,517:[{caption:"引用2"}]
-	,768:[{caption:"R3"},"xxxx",1024,"qqqq"]
-	,256: [ {caption:"R2"} ,"c1", 516, "c2", 768]
-	,512: [{caption:"R1"} ,"b1", 256 , "b2",256]
-};
 
 var createBySelections=function(selections,foreign_selections,payload,opts) {
 	var args=[];
@@ -25,8 +17,13 @@ var createBySelections=function(selections,foreign_selections,payload,opts) {
 
 	for (var i=0;i<selections.length;i++) {
 		var sel=selections[i];
-		this.setSpanCaption(sel[0],sel[1],sel[2]);
-		args.push( this.pcodeFromSpan(sel[0],sel[1]) )
+		if (sel[1]>0) { //span
+			this.setSpanCaption(sel[0],sel[1],sel[2]);
+			args.push( this.pcodeFromSpan(sel[0],sel[1]) )
+		} else { //rel
+			args.push([sel[0],0]);
+		}
+
 		args.push(sel[3]||opts.desc||"…"); //place holder for description
 	}
 
@@ -35,8 +32,12 @@ var createBySelections=function(selections,foreign_selections,payload,opts) {
 		var sels=foreign_selections[j];
 		for (var k=0;k<sels.length;k++) {
 			var sel=sels[k];
-			ext.setSpanCaption(sel[0],sel[1],sel[2]);
-			args.push( this.pcodeFromSpan(sel[0],sel[1],j) );
+			if (sel[1]>0) { //span
+				ext.setSpanCaption(sel[0],sel[1],sel[2]);
+				args.push( this.pcodeFromSpan(sel[0],sel[1],j) );
+			} else {
+				args.push( this.externalPCode(sel[0], j ) );
+			}
 			args.push(sel[3]||opts.desc||"…"); //place holder for description
 		}
 	}
@@ -74,24 +75,27 @@ var store_paradigm=Reflux.createStore({
 		// first key in wid_selections is master db, the rest are foreign
 		var wid=Object.keys(wid_selections);
 		if (wid.length==0) return null;
-		var res={ master:wid[0] , master_selections:null,foreign_selections:null };
+		var res={ master:this.wid2dbid(wid[0]) , master_selections:null,foreign_selections:null };
 
 		for (var i in wid_selections) {
-			if (i==res.master) {
+			if (i==wid[0]) {
 				res.master_selections=wid_selections[i];
 			} else {
-				if (!res.foreign_selections) res.foreign_selections={};
 				var foreign_db=this.wid2dbid(i);
-				res.foreign_selections[foreign_db]=wid_selections[i];
+				if (foreign_db===res.master) {
+					res.master_selections=res.master_selections.concat(wid_selections[i]);
+				} else {
+					if (!res.foreign_selections) res.foreign_selections={};
+					res.foreign_selections[foreign_db]=wid_selections[i];
+				}
 			}
 		}
-		res.master=this.wid2dbid(wid[0]);
 		return res;
 	}
 	,get:function(pcode,dbid) {
 		var pd=this.load(dbid);
 		if (!pd) return;
-		return pd.getPayload(pcode);
+		return pd.get(pcode);
 	}
 	,getDBName:function(dbid,externalid) {
 		var pd=this.load(dbid);
@@ -105,6 +109,8 @@ var store_paradigm=Reflux.createStore({
 		for (var i in res.foreign_selections)	this.load(i);
 		var pcode=createBySelections.call(master,res.master_selections,res.foreign_selections,payload);
 		actions_pnode.open(pcode,res.master);
+
+		actions_selection.clearSelections();
 	}
 })
 module.exports=store_paradigm;

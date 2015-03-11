@@ -37,6 +37,22 @@ var store_selection=Reflux.createStore({
 		}
 		this.onSetSelections(cleared);
 	}
+	,onToggleSelection:function(wid,start,len,text) {
+		var selections=this.selections[wid] || [];
+		var removed=false;
+		for (var i=0;i<selections.length;i++) {
+			var sel=selections[i];
+			if (sel[0]===start && sel[1]===len) {
+					removed=true;
+					selections.splice(i,1);
+					break;
+			}
+		}
+		if (!removed) {
+			selections.push([start,len,text]);
+		}
+		this.onSetSelection(selections , wid);
+	}
 	,onAddSelection:function(wid,existingselections,start,len,append,text) {
 		var selections=JSON.parse(JSON.stringify(existingselections));
 		var oldselections=selections;
@@ -83,6 +99,12 @@ var store_selection=Reflux.createStore({
 			this.trigger(this.selections,updated[i]); //notify affected view
 		}
 		actions.clearHighlights();
+
+		for (var i in this.selections) {
+			if (this.selections[wid].length===0) {
+				delete this.selections[wid];
+			}
+		}
 	}
 	,getSelections:function(){
 		return this.selections;

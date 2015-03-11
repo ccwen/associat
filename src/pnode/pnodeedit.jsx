@@ -2,6 +2,8 @@ var Reflux=require("reflux");
 var React=require("react");
 var action_pnode=require("../actions/pnode");
 var action_paradigm=require("../actions/paradigm");
+var action_selection=require("../actions/selection");
+var store_selection=require("../stores/selection");
 var Relation=require("./embedded_relation.jsx");
 //var testdata=require("./propedit_testdata");
 //var editing_rel=testdata.forward[1];
@@ -13,7 +15,6 @@ var store_paradigm=require("../stores/paradigm");
 var RelationDropdown=require("./relation_dropdown.jsx");
 //var editing_rel=[{caption:"editing r"}, 512, "b",512, "c", 516 ,"d", 145153,"x"];
 //var relbtnstyle={cursor:"pointer",borderBottomStyle:"double",color:"blue"};
-var dragobject=require("./drag");
 
 
 var html2pcode=function(div,old) {
@@ -33,65 +34,25 @@ var html2pcode=function(div,old) {
 }
 var PNodeEdit=React.createClass({
 	getInitialState:function() {
-		return {caretPos:0, pnode:JSON.parse(JSON.stringify(this.props.pnode))}
+		return {caretPos:0, pnode:JSON.parse(JSON.stringify(this.props.pnode)),
+			wid:this.props.dbid+"_*"+this.props.pcode};
+	}
+	,mixins:[Reflux.listenTo(store_selection,"onStoreSelection")]
+	,onStoreSelection:function(selections,wid) {
+		if (wid!==this.state.wid)return;
+		if (Object.keys(selections[wid]).length==0) {
+			this.refs.heading.getDOMNode().classList.remove("selected");
+		}
 	}
 	,propTypes:{
 		dbid:React.PropTypes.string.isRequired
 		,pcode:React.PropTypes.number.isRequired
 		,pnode:React.PropTypes.array.isRequired
 	}
-	,addSpan:function(n,at,text) {
-		var pnode=this.state.pnode;
-		var s=pnode[n];
-		var span=dragobject.start*256+dragobject.len;
-
-		//if (!this.state.relations[span]) this.state.relations[span]=[{caption:text}];
-
-		if (at==0) {
-			pnode.splice(n-1,0,span," ");
-		} else if (at==s.length-1) {
-			pnode.splice(n,0,span," ");
-		} else {
-			s2=s.substr(at);
-			pnode.splice(n+1,0,span," ",s2);
-			pnode[n]=s.substr(0,at);
-		}
-		this.setState({pnode:pnode});
-	}
-	,reldragend:function(e) {
-		e.target.classList.remove("dragging");
-	}
 	,keydown:function(e) {
 		e.preventDefault();
 	}
-	,drop:function(e) {
-		e.preventDefault();
-		/* prevent drop on same relation*/
-
-		var range=document.caretRangeFromPoint(e.clientX,e.clientY);
-		if (range.startContainer.nodeName!=="#text") return;
-		var at=range.startOffset;
-		var data = e.dataTransfer.getData("text");
-		//relations.add
-		var n=parseInt(range.startContainer.parentNode.dataset.n);
-		if (n) this.addSpan(n,at,data)
-		dragobject.dragging=false;
-	}
-	,allowdrop:function(e) {
-		if (e.target!=this.refs.body.getDOMNode()) {
-			e.stopPropagation();
-			return;
-		}
-	}
-	,reldragstart:function(e) {
-		console.log("rel dragstart");
-    	e.dataTransfer.setData("text", "QQQ");
-    	e.target.classList.add("dragging");
-    	this.dragging=e.target;
-
-	}
 	,componentDidMount:function() {
-		this.refs.body.getDOMNode().contentEditable=true;
 		action_paradigm.getRelations();
 		this.refs.caption.getDOMNode().contentEditable=true;
 	}
@@ -106,19 +67,23 @@ var PNodeEdit=React.createClass({
 			this.setState({pnode:pnode});
 		}
 	}
+	,toggleSelect:function(e) {
+		e.target.classList.toggle("selected");
+		var caption=this.state.pnode[0].caption;
+		action_selection.toggleSelection(this.state.wid,this.props.pcode,0, caption);
+	}
 	,render:function(){
 		//var relationstatic=React.renderToStaticMarkup();
 		return <div className="panel panel-default">
-			<div className="panel-heading">
-				<h3 className="panel-title" draggable="true"
-				 onDragEnd={this.reldragend} onDragStart={this.reldragstart} >
-				    <span ref="caption" onKeyDown={this.captionkeydown} title="dragable">{this.state.pnode[0].caption}</span>
+			<div ref="heading" className="panel-heading" onClick={this.toggleSelect}>
+				<span className="panel-title" >
+				    <span ref="caption" spellCheck={false} onKeyDown={this.captionkeydown}>{this.state.pnode[0].caption}</span>
 					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
 				    <span className="pull-right"><RelationDropdown/></span>
-				</h3>
+				</span>
 			</div>
 			<div ref="body" onKeyDown={this.keydown} onKeyUp={this.keyup} onInput={this.oninput} onBlur={this.onblur}
-			 onPaste={this.onpaste} onCut={this.oncut} spellCheck={false}  onDrop={this.drop} onDragOver={this.allowdrop}
+			 onPaste={this.onpaste} onCut={this.oncut} spellCheck={false}
 			 className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
 			 <Relation dbid={this.props.dbid} pnode={this.state.pnode} depth={0} caretPos={this.state.caretPos}/>
 			 </div>

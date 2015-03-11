@@ -32,16 +32,23 @@ var Relation=React.createClass({
 		return {pnode:this.props.pnode,editing:-1};
 	}
 	,openRel:function(e) {
-		this.props.rel[e.target.parentNode.dataset.n]=-this.props.rel[e.target.parentNode.dataset.n];
+		var pitem=this.props.pnode[e.target.parentNode.dataset.n];
+		if (typeof pitem==="number") {
+			pitem=-pitem;
+		} else if (typeof pitem[0]==="number") {
+			pitem[0]=-pitem[0];
+		}
+
+		this.props.pnode[e.target.parentNode.dataset.n]=pitem;
 		e.stopPropagation();
 		this.forceUpdate();
 	}
 	,renderPNode:function(dbid,pnode,opened,pcode,idx) {
 		var children=null,extra=null;
-		var rcaption=rel[0].caption;
+		var rcaption=pnode[0].caption;
 		var draggable=this.props.depth==0;
 		if (opened){
-			extra=" ",
+			extra=" ";
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
 			children=E(Relation,{depth:this.props.depth+1, pnode:pnode,dbid:dbid} );
 		} else {
@@ -99,22 +106,24 @@ var Relation=React.createClass({
 				dbid=store_paradigm.getDBName(this.props.dbid,item[1]);
 			}
 
-			if (pcode<0) opened=true;
+			if (pcode<0) {
+				opened=true;
+				pcode=-pcode;
+			}
 			var pnode=store_paradigm.get( pcode , dbid);
 			var extra=null,children=null;
 			var expander=null;
 			var draggable=this.props.depth==0;
 			if (pnode) {
-				if (Math.abs(item)%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
+				if (pcode%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
 					return this.renderPNode(dbid,pnode,opened,pcode,idx);
 				} else {
 					//final node, a span or a pnode depth > MAXVISIBLEDEPTH
-
-					return E("span",{"data-pcode":item,"data-n":idx,style:spanbtnstyle,
+					return E("span",{"data-pcode":pcode,"data-n":idx,style:spanbtnstyle,
 						key:"k"+idx,onClick:this.openpnode, draggable:draggable,contentEditable:false,readOnly:true},pnode[0].caption);
 				}
 			} else {
-				return E("span",{key:"k"+idx,"data-pcode":item, draggable:draggable,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},Math.abs(item));
+				return E("span",{key:"k"+idx,"data-pcode":pcode, draggable:draggable,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},pcode);
 			}
 		}
 	}

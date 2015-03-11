@@ -7,7 +7,7 @@
 .selected_link {background-color: highlight}
 .pinned_link {}
 .btnpinlink {cursor:pointer}
-.dragging {background-color: yellow}
+
 .closebutton{color:black;}
 .closebutton:hover {color:white;text-decoration: none; border-radius:50%; background-color: Salmon}
 div[contenteditable=true] > div {
@@ -17,8 +17,9 @@ div[contenteditable]:focus {outline:0px solid transparent};
 .scrollsyntag {height:400px;overflow-y:auto;}
 .droppable {background-color:yellow;}
 
-span.selected {background:highlight}
-span.highlighted {background:#FFFFC2}
+.panel-heading.selected {background-color:highlight}
+.selected {background-color:highlight}
+span.highlighted {background-color:#FFFFC2}
 span.editing {background:yellow}
 
 span.markup {border-radius:50%;border-style:dotted;border-color:gray};
