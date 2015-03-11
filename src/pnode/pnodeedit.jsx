@@ -59,15 +59,21 @@ var PNodeEdit=React.createClass({
 	,close:function() {
 		action_pnode.close(this.props.pcode);
 	}
+	,save:function() {
+		//this is not good
+		this.props.pnode[0].caption=this.state.pnode[0].caption;
+	}
 	,captionkeydown:function(e) {
 		if (e.key=="Enter") {
 			var pnode=this.state.pnode;
 			pnode[0].caption=e.target.innerText.substring(0,10);
 			e.preventDefault();
 			this.setState({pnode:pnode});
+			this.save();
 		}
 	}
 	,toggleSelect:function(e) {
+		if (!e.target.classList.contains("panel-heading"))return;
 		e.target.classList.toggle("selected");
 		var caption=this.state.pnode[0].caption;
 		action_selection.toggleSelection(this.state.wid,this.props.pcode,0, caption);
@@ -85,7 +91,7 @@ var PNodeEdit=React.createClass({
 			<div ref="body" onKeyDown={this.keydown} onKeyUp={this.keyup} onInput={this.oninput} onBlur={this.onblur}
 			 onPaste={this.onpaste} onCut={this.oncut} spellCheck={false}
 			 className="panel-body" style={{display:"inline-block",lineHeight:"165%"}}>
-			 <Relation dbid={this.props.dbid} pnode={this.state.pnode} depth={0} caretPos={this.state.caretPos}/>
+			 <Relation dbid={this.props.dbid} pnode={this.props.pnode} depth={0} caretPos={this.state.caretPos}/>
 			 </div>
 		</div>
 	}
