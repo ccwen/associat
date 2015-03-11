@@ -27,6 +27,7 @@ var Relation=React.createClass({
 		,dbid:React.PropTypes.string.isRequired
 		,depth:React.PropTypes.number
 		,caretPos:React.PropTypes.number
+		,self:React.PropTypes.number
 	}
 	,getDefaultProps:function(){
 		return {caretPos:0,depth:0}
@@ -49,17 +50,16 @@ var Relation=React.createClass({
 	,renderPNode:function(dbid,pnode,opened,pcode,idx) {
 		var children=null,extra=null;
 		var rcaption=pnode[0].caption;
-		var draggable=this.props.depth==0;
 		if (opened){
 			extra=" ";
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 1px darkblue"};
-			children=E(Relation,{depth:this.props.depth+1, pnode:pnode,dbid:dbid} );
+			children=E(Relation,{depth:this.props.depth+1, pnode:pnode,dbid:dbid,self:this.props.self} );
 		} else {
 			relbtnstyle={cursor:"pointer",borderBottom:"dotted 2px blue"};
 
 		}
 		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
-		return E("span",{"data-pcode":pcode,"data-n":idx,draggable:draggable,key:"k"+idx,contentEditable:false,readOnly:true}
+		return E("span",{"data-pcode":pcode,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
 						, expander, extra,
 						children,extra);
 	}
@@ -116,17 +116,21 @@ var Relation=React.createClass({
 			var pnode=store_paradigm.get( pcode , dbid);
 			var extra=null,children=null;
 			var expander=null;
-			var draggable=this.props.depth==0;
 			if (pnode) {
 				if (pcode%256==0 && this.props.depth<MAXVISIBLEDEPTH) {
 					return this.renderPNode(dbid,pnode,opened,pcode,idx);
 				} else {
-					//final node, a span or a pnode depth > MAXVISIBLEDEPTH
-					return E("span",{"data-pcode":pcode,"data-n":idx,style:spanbtnstyle,
-						key:"k"+idx,onClick:this.openpnode, draggable:draggable,contentEditable:false,readOnly:true},pnode[0].caption);
+					var caption=pnode[0].caption;
+					if (this.props.self==pcode) {
+						return E("span",{key:"k"+idx,"data-n":idx,},"～");
+					} else {
+						//final node, a span or a pnode depth > MAXVISIBLEDEPTH
+						return E("span",{"data-pcode":pcode,"data-n":idx,style:spanbtnstyle,
+							key:"k"+idx,onClick:this.openpnode},caption);
+					}
 				}
 			} else {
-				return E("span",{key:"k"+idx,"data-pcode":pcode, draggable:draggable,"data-n":idx,"style":spanbtnstyle,"contentEditable":false},pcode);
+				return E("span",{key:"k"+idx,"data-pcode":pcode, "data-n":idx,"style":spanbtnstyle,"contentEditable":false},pcode);
 			}
 		}
 	}

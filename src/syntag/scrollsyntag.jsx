@@ -176,7 +176,8 @@ var ScrollSyntag=React.createClass({
 		var children=null;
 		if (ends.length) {
 			children=ends.map(function(markup,idx){
-				return E(Relation,{key:"i"+idx,depth:1,dbid:this.props.db.dbname,pnode:[{},markup[2]]});
+				var self=markup[0]*256+(markup[1]-markup[0]+1);
+				return E(Relation,{key:"i"+idx,self:self,depth:0,dbid:this.props.db.dbname,pnode:[{},markup[2]]});
 			},this);
 		}
 		if (!children) return null;
