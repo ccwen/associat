@@ -48,12 +48,20 @@ var ScrollSyntag=React.createClass({
 			this.pageid=pg.id;
 		}
 	}
+	,componentWillUnmount:function() {
+		clearInterval(this.fvptimer);
+	}
 	,componentWillReceiveProps:function() {
 		if (this.props.opts.scrollto) this.vpos=this.props.opts.scrollto;
 	}
 	,componentDidUpdate:function() {
 		if (this.updatedtimer) clearTimeout(this.updatedtimer);
-		if (this.vpos) this.goToVpos(this.vpos);
+
+		if (this.vpos) {
+			this.goToVpos(this.vpos);
+			this.vpos=0;
+		}
+
 		var that=this;
 		if (this.props.onVisiblePageChanged) {
 				this.updatedtimer=setTimeout(function(){
@@ -62,23 +70,33 @@ var ScrollSyntag=React.createClass({
 					that.vpos=0;
 			},300);
 		}
+
+		if (this.fvptimer) {
+			clearInterval(this.fvptimer);
+			this.fvptimer=setInterval(function(){
+				that.getFirstVisiblePage();
+			},3000);
+		}
+
 	}
 	,componentDidMount:function(){
 	  if (this.vpos) {
 			this.goToVpos(this.vpos);
-		} else if (this.props.opts.pageid) {
+			this.vpos=0;
+		} else
+
+		if (this.props.opts.pageid) {
 			this.goToPage(this.props.opts.pageid);
 		} else {
 			this.loadNextPage();
 		}
 		var that=this;
-		if (this.props.onFirstVisiblePageChanged) setInterval(function(){
+		if (this.props.onFirstVisiblePageChanged) this.fvptimer=setInterval(function(){
 			that.getFirstVisiblePage();
 		},3000);
 	}
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)
-
 		this.refs.scrollPagination.handlePageEvent(pageId, event);
 	}
 	,getPageText:function(pageId,cb,context) {
@@ -105,21 +123,22 @@ var ScrollSyntag=React.createClass({
 		var nseg=this.props.db.absSegFromVpos(vpos);
 		if (nseg>2) nseg-=1;
 		this.loadPage(pages[nseg]);
-		this.vpos=0;
 	}
 	,loadPage:function(page,prev) {
+		if (prev) {
+			this.loadedPages.unshift(page);
+		} else {
+			this.loadedPages.push(page);
+		}
+
 		this.getPageText(page.id,function(data,segname){
-			setTimeout(function(){
 				page.data=data;
 				page.segname=segname;
 				if (prev) {
-					this.loadedPages.unshift(page);
 					this.setState({hasPrevPage: this.hasPrevPage()});
 				} else {
-					this.loadedPages.push(page);
 					this.setState({hasNextPage: this.hasNextPage()});
 				}
-			}.bind(this),1);
 		},this);
 	}
 	,loadNextPage : function () {
@@ -212,6 +231,7 @@ var ScrollSyntag=React.createClass({
 		return E("span",{className:cls,key:"i"+idx,"data-vpos":vpos},text,children);
 	}
 	,render: function () {
+
 		return E(ScrollPagination, {
 			ref: "scrollPagination",
 			loadNextPage: this.loadNextPage,
