@@ -51,16 +51,22 @@ var ScrollSyntag=React.createClass({
 	,componentWillUnmount:function() {
 		clearInterval(this.fvptimer);
 	}
-	,componentWillReceiveProps:function() {
-		if (this.props.opts.scrollto) this.vpos=this.props.opts.scrollto;
+	,componentWillReceiveProps:function(nextProps) {
+		if (nextProps.opts.scrollto) {
+			var scrollto=parseInt(nextProps.opts.scrollto);
+			this.vpos=Math.floor(scrollto / 256);
+			var len=scrollto%256;
+			this.setState({highlights:[ [this.vpos,len ] ] });
+		}
 	}
 	,componentDidUpdate:function() {
 		if (this.updatedtimer) clearTimeout(this.updatedtimer);
-
-		if (this.vpos) {
-			this.goToVpos(this.vpos);
-			this.vpos=0;
-		}
+		setTimeout(function(){
+			if (this.vpos) {
+				this.goToVpos(this.vpos);
+				this.vpos=0;
+			}
+		}.bind(this),100);
 
 		var that=this;
 		if (this.props.onVisiblePageChanged) {

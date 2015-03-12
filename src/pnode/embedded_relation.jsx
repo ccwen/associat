@@ -66,7 +66,7 @@ var Relation=React.createClass({
 	,openpnode:function(e) {
 		var pcode=e.target.dataset.pcode;
 		var dbid=e.target.dataset.dbid;
-		action_dataview.open(dbid,{scrollto:Math.floor(pcode/256)});
+		action_dataview.open(dbid,{scrollto:pcode});
 	}
 	,setCaretPos:function(caretpos) {
 		var el=this.getDOMNode();
