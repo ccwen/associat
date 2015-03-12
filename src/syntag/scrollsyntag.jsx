@@ -51,13 +51,16 @@ var ScrollSyntag=React.createClass({
 	,componentWillUnmount:function() {
 		clearInterval(this.fvptimer);
 	}
-	,componentWillReceiveProps:function(nextProps) {
-		if (nextProps.opts.scrollto) {
-			var scrollto=parseInt(nextProps.opts.scrollto);
+	,scrollto:function(opts) {
+		if (opts.scrollto) {
+			var scrollto=parseInt(opts.scrollto);
 			this.vpos=Math.floor(scrollto / 256);
 			var len=scrollto%256;
 			this.setState({highlights:[ [this.vpos,len ] ] });
 		}
+	}
+	,componentWillReceiveProps:function(nextProps) {
+		this.scrollto(nextProps.opts);
 	}
 	,componentDidUpdate:function() {
 		if (this.updatedtimer) clearTimeout(this.updatedtimer);
@@ -86,12 +89,11 @@ var ScrollSyntag=React.createClass({
 
 	}
 	,componentDidMount:function(){
+		this.scrollto(this.props.opts);
 	  if (this.vpos) {
 			this.goToVpos(this.vpos);
 			this.vpos=0;
-		} else
-
-		if (this.props.opts.pageid) {
+		} else	if (this.props.opts.pageid) {
 			this.goToPage(this.props.opts.pageid);
 		} else {
 			this.loadNextPage();
