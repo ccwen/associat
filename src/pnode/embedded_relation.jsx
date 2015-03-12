@@ -5,6 +5,7 @@ var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
 
 var action_dataview=require("../actions/dataview");
 var action_paradigm=require("../actions/paradigm");
+var action_pnode=require("../actions/pnode");
 
 var store_paradigm=require("../stores/paradigm");
 var RelationTextEdit=require("./relation_textedit.jsx");
@@ -35,8 +36,23 @@ var Relation=React.createClass({
 	,getInitialState:function() {
 		return {pnode:this.props.pnode,editing:-1};
 	}
+	,editRel:function(pitem) {
+		var pcode=pitem;
+		var dbid=this.props.dbid;
+		if (typeof pitem[0]==="number") {
+			pcode=pitem[0];
+			dbid=store_paradigm.getDBName(this.props.dbid,pitem[1]);
+		}
+		action_pnode.open(pcode,dbid);
+	}
 	,openRel:function(e) {
 		var pitem=this.props.pnode[e.target.parentNode.dataset.n];
+
+		if (e.ctrlKey) {
+			this.editRel(pitem);
+			return;
+		}
+
 		if (typeof pitem==="number") {
 			pitem=-pitem;
 		} else if (typeof pitem[0]==="number") {

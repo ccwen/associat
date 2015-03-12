@@ -11,7 +11,7 @@ var mouse_mixin={
       action_selection.addSelection(this.props.wid, selections, sel.start,sel.len , e.ctrlKey , sel.text);
 	}
 	,onmousedown:function(e) {
-		console.log("mousedown")
+		//console.log("mousedown")
 	}
 };
 

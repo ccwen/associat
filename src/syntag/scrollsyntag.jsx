@@ -252,6 +252,7 @@ var ScrollSyntag=React.createClass({
 			wid:this.props.wid,
 			showCaret:true,
 		}, this.loadedPages.map(function (page, index) {
+			if (!page.data)return;
 			var spans=page.data.map(this.renderChar);
 
 			spans.unshift(<span key="pageid">{page.id}</span>);
