@@ -48,15 +48,20 @@ var ScrollSyntag=React.createClass({
 			this.pageid=pg.id;
 		}
 	}
+	,componentWillUnmount:function() {
+		clearInterval(this.fvptimer);
+	}
 	,componentWillReceiveProps:function() {
 		if (this.props.opts.scrollto) this.vpos=this.props.opts.scrollto;
 	}
 	,componentDidUpdate:function() {
 		if (this.updatedtimer) clearTimeout(this.updatedtimer);
+
 		if (this.vpos) {
 			this.goToVpos(this.vpos);
 			this.vpos=0;
 		}
+
 		var that=this;
 		if (this.props.onVisiblePageChanged) {
 				this.updatedtimer=setTimeout(function(){
@@ -78,7 +83,9 @@ var ScrollSyntag=React.createClass({
 	  if (this.vpos) {
 			this.goToVpos(this.vpos);
 			this.vpos=0;
-		} else if (this.props.opts.pageid) {
+		} else
+
+		if (this.props.opts.pageid) {
 			this.goToPage(this.props.opts.pageid);
 		} else {
 			this.loadNextPage();
@@ -90,7 +97,6 @@ var ScrollSyntag=React.createClass({
 	}
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)
-
 		this.refs.scrollPagination.handlePageEvent(pageId, event);
 	}
 	,getPageText:function(pageId,cb,context) {
@@ -109,7 +115,7 @@ var ScrollSyntag=React.createClass({
 	,goToPage:function(nseg) {
 		var pages=this.state.pages;
 		this.loadedPages=[];
-		this.loadPage(pages[nseg-1]);
+		this.loadPage(pages[nseg]);
 	}
 	,goToVpos:function(vpos) {
 		var pages=this.state.pages;
@@ -119,18 +125,20 @@ var ScrollSyntag=React.createClass({
 		this.loadPage(pages[nseg]);
 	}
 	,loadPage:function(page,prev) {
+		if (prev) {
+			this.loadedPages.unshift(page);
+		} else {
+			this.loadedPages.push(page);
+		}
+
 		this.getPageText(page.id,function(data,segname){
-			setTimeout(function(){
 				page.data=data;
 				page.segname=segname;
 				if (prev) {
-					this.loadedPages.unshift(page);
 					this.setState({hasPrevPage: this.hasPrevPage()});
 				} else {
-					this.loadedPages.push(page);
 					this.setState({hasNextPage: this.hasNextPage()});
 				}
-			}.bind(this),1);
 		},this);
 	}
 	,loadNextPage : function () {
@@ -223,6 +231,7 @@ var ScrollSyntag=React.createClass({
 		return E("span",{className:cls,key:"i"+idx,"data-vpos":vpos},text,children);
 	}
 	,render: function () {
+
 		return E(ScrollPagination, {
 			ref: "scrollPagination",
 			loadNextPage: this.loadNextPage,
@@ -238,7 +247,7 @@ var ScrollSyntag=React.createClass({
 			var spans=page.data.map(this.renderChar);
 
 			spans.unshift(<span key="pageid">{page.id}</span>);
-			return E(Page, { key: "p"+index, id:page.id,
+			return E(Page, { key: page.id, id:page.id,
 				onPageEvent: this.__handlePageEvent},spans	)
 		}.bind(this)));
 	}

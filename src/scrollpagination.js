@@ -190,7 +190,7 @@ var ScrollPagination =  React.createClass({
 		var offset = 0;
 		var pages = this.__pages;
 		unloadedPageIdsTop.forEach(function (pageId) {
-			//if (!pages[pageId]) return;
+			if (!pages[pageId]) return;
 			var height = pages[pageId].height;
 			offset += height;
 			delete pages[pageId];
@@ -306,7 +306,7 @@ var ScrollPaginationPage = React.createClass({
 	render: function () {
 		var props = {};
 		for (var k in this.props) {
-			if (k !== "component" && k !== "onPageEvent" && k !== "id" && this.props.hasOwnProperty(k)) {
+			if (k !== "component" && k !== "onPageEvent" && k !== "id" &&this.props.hasOwnProperty(k)) {
 				props[k] = this.props[k];
 			}
 		}
