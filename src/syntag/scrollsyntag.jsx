@@ -53,7 +53,10 @@ var ScrollSyntag=React.createClass({
 	}
 	,componentDidUpdate:function() {
 		if (this.updatedtimer) clearTimeout(this.updatedtimer);
-		if (this.vpos) this.goToVpos(this.vpos);
+		if (this.vpos) {
+			this.goToVpos(this.vpos);
+			this.vpos=0;
+		}
 		var that=this;
 		if (this.props.onVisiblePageChanged) {
 				this.updatedtimer=setTimeout(function(){
@@ -62,17 +65,26 @@ var ScrollSyntag=React.createClass({
 					that.vpos=0;
 			},300);
 		}
+
+		if (this.fvptimer) {
+			clearInterval(this.fvptimer);
+			this.fvptimer=setInterval(function(){
+				that.getFirstVisiblePage();
+			},3000);
+		}
+
 	}
 	,componentDidMount:function(){
 	  if (this.vpos) {
 			this.goToVpos(this.vpos);
+			this.vpos=0;
 		} else if (this.props.opts.pageid) {
 			this.goToPage(this.props.opts.pageid);
 		} else {
 			this.loadNextPage();
 		}
 		var that=this;
-		if (this.props.onFirstVisiblePageChanged) setInterval(function(){
+		if (this.props.onFirstVisiblePageChanged) this.fvptimer=setInterval(function(){
 			that.getFirstVisiblePage();
 		},3000);
 	}
@@ -97,7 +109,7 @@ var ScrollSyntag=React.createClass({
 	,goToPage:function(nseg) {
 		var pages=this.state.pages;
 		this.loadedPages=[];
-		this.loadPage(pages[nseg]);
+		this.loadPage(pages[nseg-1]);
 	}
 	,goToVpos:function(vpos) {
 		var pages=this.state.pages;
@@ -105,7 +117,6 @@ var ScrollSyntag=React.createClass({
 		var nseg=this.props.db.absSegFromVpos(vpos);
 		if (nseg>2) nseg-=1;
 		this.loadPage(pages[nseg]);
-		this.vpos=0;
 	}
 	,loadPage:function(page,prev) {
 		this.getPageText(page.id,function(data,segname){
@@ -227,7 +238,7 @@ var ScrollSyntag=React.createClass({
 			var spans=page.data.map(this.renderChar);
 
 			spans.unshift(<span key="pageid">{page.id}</span>);
-			return E(Page, { key: page.id, id:page.id,
+			return E(Page, { key: "p"+index, id:page.id,
 				onPageEvent: this.__handlePageEvent},spans	)
 		}.bind(this)));
 	}
