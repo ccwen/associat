@@ -18,6 +18,7 @@ var ScrollSyntag=React.createClass({
 	,propTypes:{
 		wid:React.PropTypes.string.isRequired
 		,db:React.PropTypes.object.isRequired
+		,opts:React.PropTypes.object.isRequired
 		,onFirstVisiblePageChanged:React.PropTypes.func
 		,onVisiblePageChanged:React.PropTypes.func
 	}
@@ -47,18 +48,25 @@ var ScrollSyntag=React.createClass({
 			this.pageid=pg.id;
 		}
 	}
+	,componentWillReceiveProps:function() {
+		if (this.props.opts.scrollto) this.vpos=this.props.opts.scrollto;
+	}
 	,componentDidUpdate:function() {
 		if (this.updatedtimer) clearTimeout(this.updatedtimer);
+		if (this.vpos) this.goToVpos(this.vpos);
 		var that=this;
 		if (this.props.onVisiblePageChanged) {
 				this.updatedtimer=setTimeout(function(){
 					that.props.onVisiblePageChanged(that.props.wid,that.loadedPages[0].id,
 					that.loadedPages[that.loadedPages.length-1].id);
+					that.vpos=0;
 			},300);
 		}
 	}
 	,componentDidMount:function(){
-		if (this.props.opts.pageid) {
+	  if (this.vpos) {
+			this.goToVpos(this.vpos);
+		} else if (this.props.opts.pageid) {
 			this.goToPage(this.props.opts.pageid);
 		} else {
 			this.loadNextPage();
@@ -70,6 +78,7 @@ var ScrollSyntag=React.createClass({
 	}
 	,__handlePageEvent: function (pageId, event) {
 		//console.log(this.loadedPages)
+
 		this.refs.scrollPagination.handlePageEvent(pageId, event);
 	}
 	,getPageText:function(pageId,cb,context) {
@@ -89,6 +98,14 @@ var ScrollSyntag=React.createClass({
 		var pages=this.state.pages;
 		this.loadedPages=[];
 		this.loadPage(pages[nseg]);
+	}
+	,goToVpos:function(vpos) {
+		var pages=this.state.pages;
+		this.loadedPages=[];
+		var nseg=this.props.db.absSegFromVpos(vpos);
+		if (nseg>2) nseg-=1;
+		this.loadPage(pages[nseg]);
+		this.vpos=0;
 	}
 	,loadPage:function(page,prev) {
 		this.getPageText(page.id,function(data,segname){

@@ -3,7 +3,7 @@ var Reflux=require("reflux");
 var textstyle={cursor:"auto"};
 var spanbtnstyle={cursor:"pointer",borderBottom:"solid 2px blue"};
 
-var action_syntag=require("../actions/syntag");
+var action_dataview=require("../actions/dataview");
 var action_paradigm=require("../actions/paradigm");
 
 var store_paradigm=require("../stores/paradigm");
@@ -59,13 +59,14 @@ var Relation=React.createClass({
 
 		}
 		var expander=E("span",{onClick:this.openRel, style:relbtnstyle},rcaption);
-		return E("span",{"data-pcode":pcode,"data-n":idx,key:"k"+idx,contentEditable:false,readOnly:true}
+		return E("span",{"data-pcode":pcode,"data-n":idx,key:"k"+idx}
 						, expander, extra,
 						children,extra);
 	}
 	,openpnode:function(e) {
 		var pcode=e.target.dataset.pcode;
-		action_syntag.goSegByVpos("ds",Math.floor(pcode/256));
+		var dbid=e.target.dataset.dbid;
+		action_dataview.open(dbid,{scrollto:Math.floor(pcode/256)});
 	}
 	,setCaretPos:function(caretpos) {
 		var el=this.getDOMNode();
@@ -122,10 +123,10 @@ var Relation=React.createClass({
 				} else {
 					var caption=pnode[0].caption;
 					if (this.props.self==pcode) {
-						return E("span",{key:"k"+idx,"data-n":idx,},"～");
+						return E("span",{key:"k"+idx,"data-n":idx,},"~");
 					} else {
 						//final node, a span or a pnode depth > MAXVISIBLEDEPTH
-						return E("span",{"data-pcode":pcode,"data-n":idx,style:spanbtnstyle,
+						return E("span",{"data-pcode":pcode,"data-dbid":dbid,"data-n":idx,style:spanbtnstyle,
 							key:"k"+idx,onClick:this.openpnode},caption);
 					}
 				}

@@ -139,8 +139,8 @@ var store_dataview=Reflux.createStore({
 			}(entries[i],i));
 		}
 	}
-	,onOpen:function(dbname,scrollto,insertAt) {
-		this.opendb(dbname,scrollto,insertAt,function(){
+	,onOpen:function(dbname,opts,insertAt) {
+		this.opendb(dbname,opts,insertAt,function(){
 			this.trigger(this.dataviews);
 			this.updateDb();
 		});

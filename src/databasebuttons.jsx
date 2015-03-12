@@ -11,7 +11,7 @@ var DatabaseButtons=React.createClass({
 	,sortDataview:function(databases){
 		var out=[];
 		databases=databases.map(function(db){
-			if (db.indexOf(".kdb")>-1) db=db.substring(0,db.length-4);	
+			if (db.indexOf(".kdb")>-1) db=db.substring(0,db.length-4);
 			return db;
 		});
 
@@ -31,10 +31,10 @@ var DatabaseButtons=React.createClass({
 	,opendb:function(e) {
 		var insertAt;
 		if (e.ctrlKey) insertAt=0;
-		actions.open(e.target.name, 0, insertAt );
+		actions.open(e.target.name, {scrollto:0}, insertAt );
 	}
 	,renderItem:function(item,idx) {
-		return <button className="btn btn-default" 
+		return <button className="btn btn-default"
 			key={idx} name={item[0]}>{item[1]}</button>
 	}
 	,render:function(){
