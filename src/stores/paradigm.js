@@ -73,6 +73,17 @@ var store_paradigm=Reflux.createStore({
 		this.visibleRanges[dbname]=[fromvpos,tovpos];
 		this.trigger(dbname,out);
 	}
+	,update:function(dbname) {
+		if (dbname) {
+			var r=this.visibleRanges[dbname];
+			this.onSetVisibleRange(dbname,r[0],r[1]);
+		} else {
+			for (var i in this.barrels) {
+				var r=this.visibleRanges[i];
+				this.onSetVisibleRange(i,r[0],r[1]);							
+			}
+		}
+	}
 	,wid2dbid:function(wid) {
 		var i=wid.lastIndexOf("_");
 		return wid.substr(0,i);

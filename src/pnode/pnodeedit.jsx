@@ -62,6 +62,7 @@ var PNodeEdit=React.createClass({
 	,save:function() {
 		//this is not good
 		this.props.pnode[0].caption=this.state.pnode[0].caption;
+		action_paradigm.update();
 	}
 	,captionkeydown:function(e) {
 		if (e.key=="Enter") {
