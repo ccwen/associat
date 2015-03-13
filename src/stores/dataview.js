@@ -114,11 +114,12 @@ var store_dataview=Reflux.createStore({
 			var key=this.getNewKey(dbname);
 			if (typeof insertAt=="undefined") { //open freely
 				var at=this.exists(db);
-				if (at>-1) {
-					key=this.dataviews[at][0];
-					this.dataviews.splice(at,1); //remove opened
+				if (at===-1) {
+					this.dataviews.push([key,db,dbopts]);
+					//key=this.dataviews[at][0];
+					//this.dataviews.splice(at,1); //remove opened
 				}
-				this.dataviews.unshift([key,db,dbopts]);
+
 			} else { //user specified an insert point
 				this.dataviews.splice(insertAt,0,[key,db,dbopts]);
 			}
