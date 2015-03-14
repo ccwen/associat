@@ -255,7 +255,7 @@ var ScrollSyntag=React.createClass({
 			if (!page.data)return;
 			var spans=page.data.map(this.renderChar);
 
-			spans.unshift(<span key="pageid">{page.id}</span>);
+			spans.unshift(<span key="pageid">{page.id+")"}</span>);
 			return E(Page, { key: page.id, id:page.id,
 				onPageEvent: this.__handlePageEvent},spans	)
 		}.bind(this)));

@@ -3,5 +3,6 @@
 var actions=require("reflux").createActions([
 	"open"
 	,"close"
+	,"update"
 ]);
 module.exports=actions;

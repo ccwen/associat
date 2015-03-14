@@ -1,16 +1,33 @@
 var React=require("react");
+var action_pnode=require("../actions/pnode");
 var Relation_dropdown=React.createClass({
-	render:function() {
+	propTypes:{
+			items:React.PropTypes.array.isRequired
+			,pd:React.PropTypes.object.isRequired
+	}
+	,openpnode:function(e) {
+		//too low level, should be able to open by [pcode,number_dbid]
+		var pcode=this.props.items[parseInt(e.target.dataset.n)];
+
+		if (typeof pcode=="number") {
+			action_pnode.open(pcode,this.props.pd.dbid[0]);
+		} else {
+			var dbid=this.props.pd.getExternal(pcode[1]).dbid[0];
+			action_pnode.open(pcode[0],dbid);
+		}
+
+	}
+	,renderItem:function(item,idx) {
+		var rel=this.props.pd.get(item);
+		return <li key={"i"+idx}><a data-n={idx} onClick={this.openpnode} href="#">{rel[0].caption}</a></li>
+	}
+	,render:function() {
 		return <div className="btn-group pull-left">
 			  <button type="button" className="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-			    used by<span className="caret"></span>
+			    {this.props.items.length?this.props.items.length:""} pnode<span className="caret"></span>
 			  </button>
 			  <ul className="dropdown-menu dropdown-menu-right" role="menu">
-			    <li><a href="#">Action</a></li>
-			    <li><a href="#">中文</a></li>
-			    <li><a href="#">Something else here</a></li>
-			    <li className="divider"></li>
-			    <li><a href="#">Separated link</a></li>
+			    {this.props.items.map(this.renderItem)}
 			  </ul>
 			</div>
 	}

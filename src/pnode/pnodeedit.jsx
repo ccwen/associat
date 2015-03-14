@@ -4,6 +4,7 @@ var action_pnode=require("../actions/pnode");
 var action_paradigm=require("../actions/paradigm");
 var action_selection=require("../actions/selection");
 var store_selection=require("../stores/selection");
+
 var Relation=require("./embedded_relation.jsx");
 //var testdata=require("./propedit_testdata");
 //var editing_rel=testdata.forward[1];
@@ -48,16 +49,20 @@ var PNodeEdit=React.createClass({
 		dbid:React.PropTypes.string.isRequired
 		,pcode:React.PropTypes.number.isRequired
 		,pnode:React.PropTypes.array.isRequired
+		,usedby:React.PropTypes.array.isRequired
 	}
 	,keydown:function(e) {
 		e.preventDefault();
+	}
+	,componentWillMount:function() {
+		this.pd=store_paradigm.load(this.props.dbid);
 	}
 	,componentDidMount:function() {
 		action_paradigm.getRelations();
 		this.refs.caption.getDOMNode().contentEditable=true;
 	}
 	,close:function() {
-		action_pnode.close(this.props.pcode);
+		action_pnode.close(this.props.pcode,this.props.dbid);
 	}
 	,save:function() {
 		//this is not good
@@ -79,6 +84,11 @@ var PNodeEdit=React.createClass({
 		var caption=this.state.pnode[0].caption;
 		action_selection.toggleSelection(this.state.wid,this.props.pcode,0, caption);
 	}
+	,usedby:function() {
+		if (this.props.usedby.length) {
+			return <span className="pull-right"><RelationDropdown pd={this.pd} items={this.props.usedby}/></span>
+		}
+	}
 	,render:function(){
 		//var relationstatic=React.renderToStaticMarkup();
 		return <div className="panel panel-default">
@@ -86,7 +96,7 @@ var PNodeEdit=React.createClass({
 				<span className="panel-title" >
 				    <span ref="caption" spellCheck={false} onKeyDown={this.captionkeydown}>{this.state.pnode[0].caption}</span>
 					<a href="#" onClick={this.close} className="pull-right btn btn-xs btn-link closebutton">{"\u2613"}</a>
-				    <span className="pull-right"><RelationDropdown/></span>
+				    {this.usedby()}
 				</span>
 			</div>
 			<div ref="body" onKeyDown={this.keydown} onKeyUp={this.keyup} onInput={this.oninput} onBlur={this.onblur}

@@ -118,6 +118,8 @@ var store_dataview=Reflux.createStore({
 					this.dataviews.push([key,db,dbopts]);
 					//key=this.dataviews[at][0];
 					//this.dataviews.splice(at,1); //remove opened
+				} else {
+					this.dataviews[at][2]=dbopts;
 				}
 
 			} else { //user specified an insert point

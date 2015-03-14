@@ -11,7 +11,7 @@ var PNodes = React.createClass({
     this.setState({pnodes:data});
   }
   ,renderItem:function(item,idx) {
-    return <PNodeEdit key={idx} pcode={item[0]} dbid={item[2]} pnode={item[1]}/>
+    return <PNodeEdit key={idx} pcode={item[0]} dbid={item[2]} pnode={item[1]} usedby={item[3]||[]}/>
   }
   ,render: function() {
     return (
