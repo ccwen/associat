@@ -1,5 +1,4 @@
 var Reflux=require("reflux");
-var React=require("react");
 var actions=require("../actions/context");
 var store_context=Reflux.createStore({
   data:[]
