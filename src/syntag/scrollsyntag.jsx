@@ -57,6 +57,9 @@ var ScrollSyntag=React.createClass({
 			this.vpos=Math.floor(scrollto / 256);
 			var len=scrollto%256;
 			this.setState({highlights:[ [this.vpos,len ] ] });
+		} else if (opts.highlight) {
+			this.vpos=opts.highlight[0];
+			this.setState({highlights:[ opts.highlight ] });
 		}
 	}
 	,componentWillReceiveProps:function(nextProps) {
