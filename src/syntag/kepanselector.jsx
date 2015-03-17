@@ -10,6 +10,7 @@ var KepanSelector = React.createClass({
   }
   ,componentDidMount:function() {
     this.props.db.get(["extra"],function(data){
+      if (!data) return;
       this.setState({items:Object.keys(data)});
     },this);
   }
