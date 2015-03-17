@@ -28,7 +28,7 @@ var TocTrees = React.createClass({
     if (toc[n].n) {
       end=toc[toc[n].n].vpos;
     }
-    
+
     if (n==toc.length) end=db.get("meta").vsize;
     action_dataview.open(db.dbname,{highlight:[ start,end-start]});
   }
@@ -36,7 +36,7 @@ var TocTrees = React.createClass({
     var cls="tab-pane";
     if (idx==0) cls+=" active";
     return <div key={idx} className={cls} id={item.id}>
-      <TreeToc tocid={item.id} data={item.toc} key={idx} onSelect={this.onSelect}/>
+      <TreeToc opts={{editable:true}} tocid={item.id} data={item.toc} key={idx} onSelect={this.onSelect}/>
     </div>
   }
   ,close:function(e) {
