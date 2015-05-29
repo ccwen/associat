@@ -5,6 +5,7 @@ var moedict,openlit;
 var pat=/\[引\]([^\n^。]+?)：「(.+?)」/g ;
 var citations=[],ncitation=0;
 var fs=require("fs");
+var MAXLINK=10000;
 kde.open("moedict",function(err,db){
 	moedict=db;
 	kse.search("openlit","子",function(error,res){
@@ -13,13 +14,14 @@ kde.open("moedict",function(err,db){
 			citations=out;
 			fs.writeFileSync("citations.json",JSON.stringify(citations,""," "),"utf8");
 			console.log("start searching",citations.length,"links");
-			//searchlink();
+			searchlink();
 		});
 	})
 });
 var found=[];
-var bingo=function(rawresult) {
-	found.push([ncitation,rawresult,citations[ncitation]]);
+var bingo=function(rawresult,excerpt,db) {
+	var len=citations[ncitation];
+	found.push([ncitation,rawresult,citations[ncitation],excerpt.text]);
 }
 var finalize=function() {
 	fs.writeFileSync("found.json",JSON.stringify(found,""," "),"utf8");
@@ -27,14 +29,14 @@ var finalize=function() {
 }
 var searchlink=function() {
 	var tofind=citations[ncitation][5].substr(0,6);
-	kse.search("openlit",tofind,{nogroup:true},function(err,res){
+	kse.search("openlit",tofind,{range:{start:0},nohighlight:true},function(err,res){
 		var percent=(citations.length/100);
 		var now=Math.floor(ncitation/percent)+1;
 		if (now>last) console.log(now+"%");
 		last=now;
 
 		if (res && res.rawresult && res.rawresult.length==1) {
-			bingo(res.rawresult[0]);	
+			bingo(res.rawresult[0],res.excerpt[0],res.engine);	
 		}
 
 		ncitation++;
@@ -60,7 +62,7 @@ var findLinks=function(cb) {
 				if (!data[i][j]) continue;
 				var ci=pd.citation.extract(data[i][j],{startvpos:vpos,tokenize:openlit.analyzer.tokenize,pat:pat});
 				out=out.concat(ci);
-				//if (out.length>1000) break;
+				if (MAXLINK && out.length>MAXLINK) break;
 			}
 		}
 		cb(out);
